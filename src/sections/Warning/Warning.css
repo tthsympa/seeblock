@@ -1,0 +1,10 @@
+.container {
+  position: relative;
+  display: flex;
+  flex: 8;
+  width: fit-content;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+  margin-top: 120px;
+}

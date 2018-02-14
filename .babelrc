@@ -1,0 +1,38 @@
+{
+  "presets": [
+    "flow",
+    "env",
+    "react",
+    "stage-0"
+],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./src"],
+        "extensions": [".js", ".css"],
+        "alias": {
+          "actions": "./src/actions",
+          "assets": "./src/assets",
+          "components": "./src/components",
+          "config": "./src/config",
+          "reducers": "./src/reducers",
+          "reduxTypes": "./src/reduxTypes",
+          "sagas": "./src/sagas",
+          "helpers": "./src/helpers",
+          "sections": "./src/sections"
+        }
+      }
+    ],
+    "transform-object-rest-spread"
+  ],
+  "env": {
+    "development": {
+      "plugins": ["transform-react-jsx-source"]
+    },
+    "test": {
+      "plugins": ["transform-react-jsx-source"],
+      "presets": ["env", "stage-0"]
+    }
+  }
+}

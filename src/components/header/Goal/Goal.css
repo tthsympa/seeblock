@@ -1,0 +1,6 @@
+.goal {
+  display: flex;
+  flex: 3;
+  margin-right: 16px;
+  margin-bottom: 16px;
+}

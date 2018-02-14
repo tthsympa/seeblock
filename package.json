@@ -1,0 +1,83 @@
+{
+  "name": "seeblock",
+  "version": "0.0.2",
+  "description": "Visual interpretation of what happen in a blockchain",
+  "main": "index.js",
+  "scripts": {
+    "flow": "flow --show-all-errors ; printf \"\\033[0;31m‼️  Ignore all node_modules errors ‼️\\033[0m\n\"",
+    "dev": "NODE_ENV=development webpack-dev-server --env.NODE_ENV=development --config ./webpack/webpack.dev.js",
+    "build": "cp -R public/ build/ && NODE_ENV=production webpack --progress --config ./webpack/webpack.prod.js",
+    "serve": "yarn build && serve build/ -l 8080",
+    "release": "standard-version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tthsympa/seeblock.git"
+  },
+  "keywords": [
+    "blockchain",
+    "react",
+    "threejs",
+    "eth"
+  ],
+  "author": "TTH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tthsympa/seeblock"
+  },
+  "homepage": "https://github.com/tthsympa/seeblock#readme",
+  "dependencies": {
+    "@material-ui/core": "^4.9.5",
+    "@tweenjs/tween.js": "^17.2.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "flow-bin": "^0.75.0",
+    "immutable": "^3.8.2",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-lottie": "^1.0.0",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
+    "redux-saga": "^0.16.0",
+    "three": "^0.90.0",
+    "web3": "^1.0.0-beta.30",
+    "webpack": "^4.43.0",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.1",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-module-resolver": "^2.5.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "css-loader": "^0.28.9",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-import-resolver-babel-module": "^3.0.0",
+    "eslint-plugin-flowtype": "^2.39.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "^21.3.2",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "file-loader": "^1.1.6",
+    "less": "^2.3.1",
+    "less-loader": "^4.0.5",
+    "standard-version": "^9.5.0",
+    "style-loader": "^0.20.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-merge": "^4.2.2"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true
+    }
+  }
+}
