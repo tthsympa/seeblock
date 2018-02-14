@@ -1,2 +1,2 @@
 # seeblock
-Visual interpretation of what happened in a blockchain
+Visual interpretation of what happen in a blockchain
