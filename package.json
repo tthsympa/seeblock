@@ -1,0 +1,60 @@
+{
+  "name": "seeblock",
+  "version": "0.0.1",
+  "description": "Visual interpretation of what happen in a blockchain",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "flow": "flow --show-all-errors ; printf \"\\033[0;31m‼️  Ignore all node_modules errors ‼️\\033[0m\n\"",
+    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TTHledieu/seeblock.git"
+  },
+  "keywords": [
+    "blockchain",
+    "react",
+    "threejs",
+    "eth"
+  ],
+  "author": "TTH & JC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TTHledieu/seeblock/issues"
+  },
+  "homepage": "https://github.com/TTHledieu/seeblock#readme",
+  "dependencies": {
+    "babel-preset-env": "^1.6.1",
+    "flow-bin": "^0.65.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "webpack": "^3.11.0",
+    "webpack-dev-server": "^2.11.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.1",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-module-resolver": "^2.5.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-import-resolver-babel-module": "^3.0.0",
+    "eslint-plugin-flowtype": "^2.39.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "^21.3.2",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "css-loader": "^0.28.9",
+    "less": "^2.3.1",
+    "less-loader": "^4.0.5",
+    "style-loader": "^0.20.1"
+  }
+}
