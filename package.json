@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "flow": "flow --show-all-errors ; printf \"\\033[0;31m‼️  Ignore all node_modules errors ‼️\\033[0m\n\"",
-    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js"
+    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js",
+    "geth": "geth --syncmode \"light\" --ws --wsorigins \"http://localhost:8080\""
   },
   "repository": {
     "type": "git",
