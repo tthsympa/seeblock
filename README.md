@@ -13,7 +13,7 @@ geth --syncmode "light" console
 ```
 It will download a light version of the blockchain. The `console` command start a JavaScript interpreter. You can follow the download by typing `eth.syncing` : if it return `false`, the sync is completed !
 ### Starting the project
-Before Seeblock can interact locally with the Ethereum blockchain, we must authorize communication protocol in Geth.
+Before seeblock can interact locally with the Ethereum blockchain, we must authorize communication protocol in Geth.
 Launch
 ```
 geth --syncmode "light" --ws --wsorigins "http://localhost:8080"
@@ -25,6 +25,6 @@ Go to http://localhost:8080
 Done !
 
 # Next ?
-Seeblock is a work in progress. We will be happy to receive any advice on building this app.
+seeblock is a work in progress. We will be happy to receive any advice on building this app.
 
 
