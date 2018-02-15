@@ -18,7 +18,7 @@ Launch
 ```
 geth --syncmode "light" --ws --wsorigins "http://localhost:8080"
 ```
-In another terminal, go in Seeblock cloned folder and launch `npm run dev`
+In another terminal, go in seeblock cloned folder and launch `npm run dev`
 
 Go to http://localhost:8080 
 
