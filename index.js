@@ -2,8 +2,8 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './src/containers/App';
+import Root from 'containers/Views/Root';
 
 /* global  document:true */
 // $FlowFixMe
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(<Root />, document.getElementById('app'));

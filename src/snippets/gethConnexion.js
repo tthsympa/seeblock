@@ -12,7 +12,7 @@ type State = {
 }
 
 // eslint-disable-next-line react/prefer-stateless-function
-class App extends React.Component<Props, State> {
+class Root extends React.Component<Props, State> {
   state: State = {
     currentBlock: -1,
   };
@@ -24,13 +24,15 @@ class App extends React.Component<Props, State> {
     const web3: Web3 = this.initializeWeb3();
     const newBlocksHeaderEvent = web3.eth.subscribe('newBlockHeaders')
       .on('data', this.setCurrentBlock);
+
     return (
       <div>
         <p>This is my new react app</p>
         <p>Current block : {this.state.currentBlock}</p>
+        <Mycube />
       </div>
     );
   }
 }
 
-export default App;
+export default Root;
