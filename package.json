@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "flow": "flow --show-all-errors ; printf \"\\033[0;31m‼️  Ignore all node_modules errors ‼️\\033[0m\n\"",
-    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js"
+    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js",
+    "geth": "geth --syncmode \"light\" --ws --wsorigins \"http://localhost:8080\""
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "flow-bin": "^0.65.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "three": "^0.90.0",
     "web3": "^1.0.0-beta.30",
     "webpack": "^3.11.0",
     "webpack-dev-server": "^2.11.1"
