@@ -1,4 +1,19 @@
 .container {
   display: flex;
   flex: 1;
+  width: 100%;
+  align-items: flex-end;
+}
+
+.search {
+  flex: 3;
+}
+
+.title {
+  flex: 4;
+  align-self: center;
+}
+
+.goal {
+  flex: 3;
 }

@@ -28,6 +28,7 @@
   "dependencies": {
     "babel-preset-env": "^1.6.1",
     "flow-bin": "^0.65.0",
+    "material-ui": "^1.0.0-beta.33",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
