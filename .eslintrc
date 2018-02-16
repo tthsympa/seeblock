@@ -21,6 +21,7 @@
       }
     ],
     "quote-props": 0,
+    "no-unused-expressions": "off",
     "no-console": [
       "error",
       {

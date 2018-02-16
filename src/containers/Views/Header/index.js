@@ -1,52 +1,74 @@
 // @flow
 
 import React from 'react';
-import TextField from 'material-ui/TextField';
-import Typography from 'material-ui/Typography';
-import { withTheme } from 'material-ui/styles';
+import SearchBar from 'components/header/SearchBar';
+import Title from 'components/header/Title';
+import Goal from 'components/header/Goal';
 import styles from './Header.css';
 
 type Props = {
 
 };
 
+type State = {
+  searchInput: string,
+  inputError: boolean,
+};
+
 // eslint-disable-next-line react/prefer-stateless-function
-class Header extends React.Component<Props> {
+class Header extends React.Component<Props, State> {
+  constructor() {
+    super();
+    this.verifyInput = this.verifyInput.bind(this);
+    this.go = this.go.bind(this);
+  }
+
+  state: State = {
+    searchInput: '',
+    inputError: false,
+  };
+
   goalText: string = 'Visual interpretation of what happen in a blockchain';
+  verifyInput: Function;
+  go: Function;
+
+  verifyInput = (input: string, inputLength: number) => {
+    if (inputLength === 42 && (/^\w+$/.test(input))) {
+      this.setState({
+        searchInput: input,
+        inputError: false,
+      });
+    } else if (/^\d+$/.test(input)) {
+      this.setState({
+        searchInput: input,
+        inputError: false,
+      });
+    } else {
+      this.setState({ searchInput: '' });
+    }
+  }
+
+  go(key: string) {
+    const { searchInput } = this.state;
+    if (key === 'Enter') {
+      searchInput ? console.log('good') : this.setState({ inputError: true });
+    }
+  }
 
   render() {
+    const { inputError } = this.state;
     return (
       <div className={styles.container}>
-        <div className={styles.search}>
-          <TextField
-            id="search"
-            label="Adress / Block / Txhash"
-            fullWidth
-            onChange={event => console.log(event.target.value)}
-          />
-        </div>
-        <div className={styles.title}>
-          <Typography
-            align="center"
-            variant="display2"
-            color="secondary"
-          >
-            seeblock
-          </Typography>
-        </div>
-        <div className={styles.goal}>
-          <Typography
-            align="right"
-            variant="subheading"
-            noWrap
-            color="primary"
-          >
-            {this.goalText}
-          </Typography>
-        </div>
+        <SearchBar
+          verifyInput={this.verifyInput}
+          go={this.go}
+          inputError={inputError}
+        />
+        <Title />
+        <Goal text={this.goalText} />
       </div>
     );
   }
 }
 
-export default withTheme()(Header);
+export default Header;
