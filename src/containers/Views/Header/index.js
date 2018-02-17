@@ -1,13 +1,16 @@
 // @flow
 
 import React from 'react';
+import { connect } from 'react-redux';
 import SearchBar from 'components/header/SearchBar';
 import Title from 'components/header/Title';
 import Goal from 'components/header/Goal';
+import { input } from 'actions/input';
+import { ADRESSLENGTH } from 'config/constants';
 import styles from './Header.css';
 
 type Props = {
-
+  dInput: typeof input,
 };
 
 type State = {
@@ -33,7 +36,7 @@ class Header extends React.Component<Props, State> {
   go: Function;
 
   verifyInput = (input: string, inputLength: number) => {
-    if (inputLength === 42 && (/^\w+$/.test(input))) {
+    if (inputLength === ADRESSLENGTH && (/^\w+$/.test(input))) {
       this.setState({
         searchInput: input,
         inputError: false,
@@ -50,8 +53,9 @@ class Header extends React.Component<Props, State> {
 
   go(key: string) {
     const { searchInput } = this.state;
+    const { dInput } = this.props;
     if (key === 'Enter') {
-      searchInput ? console.log('good') : this.setState({ inputError: true });
+      searchInput ? dInput(searchInput, 0) : this.setState({ inputError: true });
     }
   }
 
@@ -71,4 +75,12 @@ class Header extends React.Component<Props, State> {
   }
 }
 
-export default Header;
+const mapStateToProps = () => ({
+
+});
+
+const mapDispatchToProps = {
+  dInput: input,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
