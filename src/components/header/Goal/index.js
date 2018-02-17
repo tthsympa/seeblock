@@ -12,7 +12,7 @@ type Props = {
 const Goal = ({ text }: Props): Node => (
   <div className={styles.goal}>
     <Typography
-      align="right"
+      align="left"
       variant="subheading"
       noWrap
       color="primary"

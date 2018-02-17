@@ -1,5 +1,22 @@
 .container {
   display: flex;
-  flex: 1;
+  flex: 0.5;
+  align-items: center;
   width: 100%;
+}
+
+.name {
+  flex: 5;
+  margin-left: 10px;
+}
+
+.social {
+  flex: 5;
+  text-align: start;
+  line-height: 15px;
+  margin-right: 10px;
+}
+
+.link {
+  color: #C7C9E2;
 }
