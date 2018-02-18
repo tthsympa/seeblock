@@ -25,7 +25,7 @@ export type InputFetch = {
 export type InputFetchSuccess = {
   +type: 'INPUT_FETCH_SUCCESS',
   +payload: {
-    data: any,
+    data: Object,
   },
 };
 

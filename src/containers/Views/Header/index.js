@@ -6,7 +6,7 @@ import SearchBar from 'components/header/SearchBar';
 import Title from 'components/header/Title';
 import Goal from 'components/header/Goal';
 import { input } from 'actions/input';
-import { ADRESSLENGTH } from 'config/constants';
+import { TYPE, ADRESSLENGTH } from 'config/constants';
 import styles from './Header.css';
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
 type State = {
   searchInput: string,
   inputError: boolean,
+  type: number,
 };
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -29,22 +30,25 @@ class Header extends React.Component<Props, State> {
   state: State = {
     searchInput: '',
     inputError: false,
+    type: TYPE.NONE,
   };
 
   goalText: string = 'Visual interpretation of what happen in a blockchain';
   verifyInput: Function;
   go: Function;
 
-  verifyInput = (input: string, inputLength: number) => {
-    if (inputLength === ADRESSLENGTH && (/^\w+$/.test(input))) {
+  verifyInput = (ipt: string, iptLength: number) => {
+    if (iptLength === ADRESSLENGTH && (/^\w+$/.test(ipt))) {
       this.setState({
-        searchInput: input,
+        searchInput: ipt,
         inputError: false,
+        type: TYPE.ADRESS,
       });
-    } else if (/^\d+$/.test(input)) {
+    } else if (/^\d+$/.test(ipt)) {
       this.setState({
-        searchInput: input,
+        searchInput: ipt,
         inputError: false,
+        type: TYPE.BLOCK,
       });
     } else {
       this.setState({ searchInput: '' });
@@ -52,10 +56,10 @@ class Header extends React.Component<Props, State> {
   }
 
   go(key: string) {
-    const { searchInput } = this.state;
+    const { searchInput, type } = this.state;
     const { dInput } = this.props;
     if (key === 'Enter') {
-      searchInput ? dInput(searchInput, 0) : this.setState({ inputError: true });
+      searchInput ? dInput(searchInput, type) : this.setState({ inputError: true });
     }
   }
 
@@ -76,7 +80,6 @@ class Header extends React.Component<Props, State> {
 }
 
 const mapStateToProps = () => ({
-
 });
 
 const mapDispatchToProps = {
