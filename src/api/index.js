@@ -9,8 +9,7 @@ const getWeb3Object = () => new Web3(Web3.givenProvider || 'http://localhost:854
 
 const getBlockDatas = (blockNumber: number): Promise<Web3.Block> => {
   const web3: Web3 = getWeb3Object();
-  return web3.eth.getBlock(blockNumber, true)
-    .then(block => block);
+  return web3.eth.getBlock(blockNumber, true).then(block => block);
 };
 
 const getTxByAdress = async (adress: string) => {

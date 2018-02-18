@@ -8,7 +8,7 @@ const initialState: InputState = {
     type: -1,
   },
   data: {},
-  isLoading: true,
+  isLoading: false,
   error: null,
 };
 

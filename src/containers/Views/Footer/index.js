@@ -1,62 +1,44 @@
 // @flow
 
 import React from 'react';
-import { withTheme } from 'material-ui/styles';
-import Typography from 'material-ui/Typography';
+import Lottie from 'react-lottie';
+import { connect } from 'react-redux';
+import renderIf from 'utils/renderIf';
+import * as animationData from 'assets/loader.json';
 import styles from './Footer.css';
 
 type Props = {
-  theme: any,
+  isLoading: boolean,
 };
 
 type State = {
-
 }
 
 // eslint-disable-next-line react/prefer-stateless-function
 class Footer extends React.Component<Props, State> {
+  defaultOptions = {
+    loop: true,
+    autoplay: false,
+    animationData,
+  };
+
   render() {
-    const { palette } = this.props.theme;
+    const { isLoading } = this.props;
     return (
-      <div style={{ backgroundColor: palette.secondary.main }} className={styles.container}>
-        <div className={styles.name}>
-          <Typography
-            align="left"
-            variant="title"
-            noWrap
-            color="inherit"
-          >
-            seeblock
-          </Typography>
-        </div>
-        <div className={styles.social}>
-          <a
-            className="github-button"
-            href="https://github.com/TTHledieu/seeblock"
-            data-icon="octicon-star"
-            data-size="small"
-            aria-label="Star TTHledieu/seeblock on GitHub"
-          >
-            Star
-          </a>
-          <Typography
-            variant="caption"
-            noWrap
-            color="inherit"
-          >
-            <a
-              className={styles.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://t.me/TTHledieu"
-            >
-              t.me/TTHledieu
-            </a>
-          </Typography>
-        </div>
+      <div className={styles.container}>
+        {
+        renderIf(isLoading)(<Lottie
+          options={this.defaultOptions}
+          isStopped={!isLoading}
+        />)
+        }
       </div>
     );
   }
 }
 
-export default withTheme()(Footer);
+const mapStateToProps = ({ input }) => ({
+  isLoading: input.isLoading,
+});
+
+export default connect(mapStateToProps, null)(Footer);
