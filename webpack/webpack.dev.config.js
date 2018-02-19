@@ -15,6 +15,14 @@ module.exports = {
     }, {
       test: /\.css$/,
       loader: 'style-loader!css-loader?modules&importLoaders=1&localIdentName=[name]__[local]',
+    }, {
+      test: /\.(png|jpg|gif)$/,
+      use: [
+        {
+          loader: 'file-loader',
+          options: {},
+        },
+      ],
     }],
   },
   output: {

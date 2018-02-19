@@ -2,7 +2,7 @@
 
 import { takeEvery, call, put } from 'redux-saga/effects';
 import type { InputFetch } from 'reduxTypes/input';
-import fetchElemFromBC from '../api';
+import { fetchElemFromBC } from '../api';
 
 const fetchInputData = function* fetchInputData(action: InputFetch): Generator<*, *, *> {
   try {

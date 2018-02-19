@@ -7,4 +7,6 @@ export const TYPE = {
 };
 
 export const ADRESSLENGTH = 42;
-export const STARTBLOCKOFFSET = 10;
+export const STARTBLOCKOFFSET = 30;
+export const WEI = 1000000000000000000;
+export const LOCALHOST = 'http://localhost:8545';
