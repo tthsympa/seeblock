@@ -1,44 +1,41 @@
 // @flow
 
 import React from 'react';
-import Lottie from 'react-lottie';
-import { connect } from 'react-redux';
-import renderIf from 'utils/renderIf';
-import * as animationData from 'assets/loader.json';
+import type { Node } from 'react';
+import Divider from 'material-ui/Divider';
+import github from 'assets/GitHub-Mark-64px.png';
+import telegram from 'assets/Telegram-64px.png';
 import styles from './Footer.css';
 
-type Props = {
-  isLoading: boolean,
-};
+const Footer = (): Node => (
+  <div className={styles.container}>
+    <Divider />
+    <div className={styles.logos}>
+      <form action="https://github.com/TTHledieu/seeblock" target="_blank">
+        <button className={styles.logoButton}>
+          <img className={styles.logoImg} src={github} alt="github-logo" />
+        </button>
+      </form>
+      <form action="https://t.me/TTHledieu" target="_blank">
+        <button className={styles.logoButton}>
+          <img className={styles.logoImg} src={telegram} alt="telegram-logo" />
+        </button>
+      </form>
+    </div>
+  </div>
+);
 
-type State = {
-}
-
-// eslint-disable-next-line react/prefer-stateless-function
-class Footer extends React.Component<Props, State> {
-  defaultOptions = {
-    loop: true,
-    autoplay: false,
-    animationData,
-  };
-
-  render() {
-    const { isLoading } = this.props;
-    return (
-      <div className={styles.container}>
-        {
-        renderIf(isLoading)(<Lottie
-          options={this.defaultOptions}
-          isStopped={!isLoading}
-        />)
-        }
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = ({ input }) => ({
-  isLoading: input.isLoading,
-});
-
-export default connect(mapStateToProps, null)(Footer);
+export default Footer;
+// <div className={styles.loading}>
+//           {
+//           renderIf(isLoading)(<Lottie
+//             options={this.defaultOptions}
+//             isStopped={!isLoading}
+//           />)
+//           }
+//         </div>
+//  defaultOptions = {
+//   loop: true,
+//   autoplay: false,
+//   animationData,
+// };

@@ -7,4 +7,4 @@ export const TYPE = {
 };
 
 export const ADRESSLENGTH = 42;
-export const STARTBLOCKOFFSET = 10;
+export const STARTBLOCKOFFSET = 30;
