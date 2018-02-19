@@ -1,11 +1,11 @@
 // @flow
 
 import Web3 from 'web3';
-import { TYPE, STARTBLOCKOFFSET } from 'config/constants';
+import { TYPE, STARTBLOCKOFFSET, WEI, LOCALHOST } from 'config/constants';
 import type { Input } from 'reduxTypes/input';
 import { List } from 'immutable';
 
-const getWeb3Object = () => new Web3(Web3.givenProvider || 'http://localhost:8545');
+const getWeb3Object = () => new Web3(Web3.givenProvider || LOCALHOST);
 
 const getBlockDatas = (blockNumber: number): Promise<Web3.Block> => {
   const web3: Web3 = getWeb3Object();
@@ -28,9 +28,17 @@ const getTxByAdress = async (adress: string) => {
     if (block && block.transactions) {
       block.transactions.forEach((tx) => {
         if (tx.to === adress) {
-          txs.from = txs.from.push({ adress: tx.from, value: tx.value });
+          txs.from = txs.from.push({
+            adress: tx.from,
+            value: tx.value / WEI,
+            pending: tx.blockHash ? false : true,
+          });
         } else if (tx.from === adress) {
-          txs.to = txs.to.push({ adress: tx.to, value: tx.value });
+          txs.to = txs.to.push({
+            adress: tx.to,
+            value: tx.value / WEI,
+            pending: tx.blockHash ? false : true,
+          });
         }
       });
     }
@@ -39,7 +47,7 @@ const getTxByAdress = async (adress: string) => {
   return txs;
 };
 
-export default ({ elem, type }: Input) => {
+export const fetchElemFromBC = ({ elem, type }: Input) => {
   switch (type) {
     case TYPE.BLOCK:
       return getBlockDatas(parseInt(elem, 10));
@@ -47,5 +55,14 @@ export default ({ elem, type }: Input) => {
       return getTxByAdress(elem);
     default:
       return null;
+  }
+};
+
+export const createWeb3Object = () => {
+  const web3 = getWeb3Object();
+  try {
+    return web3.eth.net.getId().then(() => web3);
+  } catch (error) {
+    return null;
   }
 };

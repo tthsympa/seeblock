@@ -22,6 +22,7 @@
     ],
     "quote-props": 0,
     "no-unused-expressions": "off",
+    "no-unneeded-ternary": "off",
     "no-console": [
       "error",
       {
