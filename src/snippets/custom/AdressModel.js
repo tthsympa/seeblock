@@ -2,15 +2,27 @@
 
 import * as THREE from 'three';
 
-const AdressModel = function(status: string) {
+const AdressModel = function(status: string, step: string) {
   // Run the Group constructor with the given arguments
   THREE.Group.apply(this, arguments);
 
   const colors = {
-    pending: '#f5a162',
-    success: '#47689B',
+    '1': '#CBD1F2',
+    '2': '#6EA3D5',
+    '3': '#448F2A',
+    '4': '#F7D048',
+    '5': '#F4A73C',
+    '6': '#EA518C',
+    '7': '#442197',
   };
-
+  const config = {
+    pending: {
+      detail: 1,
+    },
+    success: {
+      detail: 0,
+    },
+  };
   const addNoise = (geometry, noiseX, noiseY, noiseZ) => {
     const nX = noiseX || 2;
     const nY = noiseY || noiseX;
@@ -23,29 +35,45 @@ const AdressModel = function(status: string) {
     }
     return geometry;
   };
-
-  const adress = new THREE.Mesh(
-    addNoise(new THREE.OctahedronGeometry(12, 1), 4, 8, 2),
-    new THREE.MeshStandardMaterial({
-      color: colors[status],
+  const RADIUS = 12;
+  const geometry = addNoise(new THREE.OctahedronGeometry(RADIUS, config[status].detail), 4, 8, 2);
+  let material;
+  if (step !== '8') {
+    material = new THREE.MeshStandardMaterial({
+      color: colors[step],
       transparent: true,
       flatShading: THREE.FlatShading,
       metalness: 0,
       roughness: 0.8,
-    }),
-  );
+    });
+  } else {
+    material = new THREE.MeshBasicMaterial({
+      color: '#FFFFFF', vertexColors: THREE.VertexColors
+    });
+    let point;
+    let color, face, numberOfSides, vertexIndex;
+    const faceIndices = [ 'a', 'b', 'c', 'd' ];
+    for (let i = 0; i < geometry.faces.length; i++) {
+      face = geometry.faces[i];
+      numberOfSides = (face instanceof THREE.Face3) ? 3 : 4;
+      for (let j = 0; j < numberOfSides; j++) 
+      {
+        vertexIndex = face[faceIndices[j]];
+        point = geometry.vertices[vertexIndex];
+        color = new THREE.Color( '#FFFFFF' );
+        color.setRGB(0.5 + point.x / RADIUS, 0.5 + point.y / RADIUS, 0.5 + point.z / RADIUS);
+        face.vertexColors[j] = color;
+      }
+    }
+  }
+
+  const adress = new THREE.Mesh(geometry, material);
   adress.rotateZ(Math.random() * Math.PI * 0.5);
   adress.rotateY(Math.random() * Math.PI * 0.5);
   this.add(adress);
 };
 
-const updateRotation = function() {
-  this.rotationPosition += this.rotationSpeed;
-  this.rotation.y = (Math.sin(this.rotationPosition));
-};
-
 AdressModel.prototype = Object.create(THREE.Group.prototype);
 AdressModel.prototype.constructor = AdressModel;
-AdressModel.prototype.updateRotation = updateRotation;
 
 export default AdressModel;
