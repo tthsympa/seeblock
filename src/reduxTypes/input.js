@@ -1,9 +1,16 @@
 // @flow
-
+import { List } from 'immutable';
 // State
 export type Input = {
   +elem: string,
   +type: number,
+};
+
+export type AdressDatas = {
+  adress: string,
+  count: number,
+  from: List<*>,
+  to: List<*>,
 };
 
 export type InputState = {
@@ -25,7 +32,7 @@ export type InputFetch = {
 export type InputFetchSuccess = {
   +type: 'INPUT_FETCH_SUCCESS',
   +payload: {
-    data: Object,
+    +data: AdressDatas,
   },
 };
 

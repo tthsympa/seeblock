@@ -1,6 +1,7 @@
 // @flow
 
 import type {
+  AdressDatas,
   InputFetch,
   InputFetchSuccess,
   InputFetchFailure,
@@ -14,7 +15,7 @@ export const input = (elem: string, type: number): InputFetch => ({
   },
 });
 
-export const inputSuccess = (data: any): InputFetchSuccess => ({
+export const inputSuccess = (data: AdressDatas): InputFetchSuccess => ({
   type: 'INPUT_FETCH_SUCCESS',
   payload: {
     data,
