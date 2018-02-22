@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/TTHledieu/seeblock#readme",
   "dependencies": {
+    "@tweenjs/tween.js": "^17.2.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "flow-bin": "^0.65.0",

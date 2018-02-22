@@ -24,6 +24,7 @@ const TRESHOLDOFFSET = 3;
 const SCALEMAX = 3;
 const SCALEMIN = 0.5;
 const SCALEZERO = 0.2;
+let INTERSECTED;
 
 // Lerping
 let t = 0;
@@ -31,7 +32,7 @@ let dt = 0.01;
 const lerp = (a, b, c) => a + (b - a) * c;
 const ease = c => (c < 0.5 ? 2 * c * c : -1 + (4 - 2 * c) * c);
 
-const createAdressModel = (value: number, status: string, from: boolean) => {
+const createAdressModel = (account: string = 'None', value: number, status: string, from: boolean) => {
   let treshold = 3;
   let step = 1;
   let scale = 0;
@@ -48,6 +49,7 @@ const createAdressModel = (value: number, status: string, from: boolean) => {
     }
   }
   const adress = new AdressModel(status, step > 8 ? '8' : step.toString());
+  adress.name = account;
   adress.scale.multiplyScalar(scale);
 
   let randX = Math.random();
@@ -79,22 +81,27 @@ class Body extends React.Component<Props, State> {
     const height = this.mount.clientHeight;
     const clock = new THREE.Clock();
     const scene = new THREE.Scene();
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
     const tick = 0;
     const camera = new THREE.PerspectiveCamera(
       75,
       width / height,
-      0.1,
+      1,
       1000,
     );
     camera.position.set(0, 181, 77);
-    camera.lookAt(scene.position);
-    camera.position.z -= 20;
+    // camera.position.z -= 20;
 
+    //  Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setClearColor('#FFFFFF');
+    renderer.setClearColor('#000000');
     renderer.setSize(width, height);
+
+    //    Controls
     const controls = new TrackballControls(camera, this.mount);
 
+    //  Lights
     const light = new THREE.PointLight('#FFFFFF', 1, 0, 2);
     light.position.set(0, 250, 0);
     const light2 = new THREE.PointLight('#FFFFFF', 1, 0, 2);
@@ -102,6 +109,7 @@ class Body extends React.Component<Props, State> {
     scene.add(light);
     scene.add(light2);
 
+    //  Custom
     const adressParticleSystem = new GPUParticleSystem({
       maxParticles: 2000,
     });
@@ -125,14 +133,14 @@ class Body extends React.Component<Props, State> {
       verticalSpeed: 1.33,
       timeScale: 2,
     };
-    // Custom
+
     //    Central sphere & pivot
     const parent = new THREE.Object3D();
     scene.add(parent);
     const pivotFrom = new THREE.Object3D();
     parent.add(pivotFrom);
     const pivotTo = new THREE.Object3D();
-    const testadress = createAdressModel(5, 'success', false);
+    const testadress = createAdressModel('none', 5, 'success', false);
     pivotTo.add(testadress);
     pivotTo.add(adressParticleSystem);
     parent.add(pivotTo);
@@ -147,10 +155,13 @@ class Body extends React.Component<Props, State> {
 
     //    Assign to this
     this.scene = scene;
+    this.raycaster = raycaster;
+    this.mouse = mouse;
     this.clock = clock;
     this.camera = camera;
     this.renderer = renderer;
     this.controls = controls;
+    this.parent = parent;
     this.pivotFrom = pivotFrom;
     this.pivotTo = pivotTo;
     this.tick = tick;
@@ -162,6 +173,7 @@ class Body extends React.Component<Props, State> {
     this.testadress = testadress;
     //    Starting
     this.mount.appendChild(this.renderer.domElement);
+    this.mount.addEventListener('mousedown', this.onDocumentMouseDown, false);
     this.start();
   }
 
@@ -179,11 +191,11 @@ class Body extends React.Component<Props, State> {
       if (Object.keys(data).length !== 0 && data.constructor === Object) {
         const { from, to } = data;
         to.forEach((v) => {
-          this.pivotTo.add(createAdressModel(v.value, v.status, false));
+          this.pivotTo.add(createAdressModel(data.adress, v.value, v.status, false));
         });
 
         from.forEach((v) => {
-          this.pivotFrom.add(createAdressModel(v.value, v.status, true));
+          this.pivotFrom.add(createAdressModel(data.adress, v.value, v.status, true));
         });
       }
     }
@@ -193,6 +205,26 @@ class Body extends React.Component<Props, State> {
     this.stop();
     this.mount.removeChild(this.renderer.domElement);
   }
+
+  onDocumentMouseDown: Function = (event) => {
+    event.preventDefault();
+    this.mouse.x = ((event.offsetX - 5) / this.mount.clientHeight) * 2 - 1;
+    this.mouse.y = -((event.offsetY + 15) / this.mount.clientWidth) * 2 + 1;
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const arrow = new THREE.ArrowHelper(this.raycaster.ray.direction, this.raycaster.ray.origin, 1000, 0xffff00);
+    this.scene.add(arrow);
+    const intersects = this.raycaster.intersectObjects(this.pivotTo.children, true);
+    if (intersects.length > 0) {
+      if (INTERSECTED !== intersects[0].object) {
+        INTERSECTED = intersects[0].object;
+        const actualPos = INTERSECTED.parent.getWorldPosition();
+        this.controls.target = new THREE.Vector3(actualPos.x, actualPos.y, actualPos.z);
+      }
+    } else {
+      INTERSECTED = null;
+      this.controls.target = new THREE.Vector3(0, 0, 0);
+    }
+  };
 
   spawnParticle = () => {
     // Apply lerp to adress with Particle
@@ -234,10 +266,13 @@ class Body extends React.Component<Props, State> {
   //    Declaring important variable
   mount: HTMLDivElement;
   scene: THREE.scene;
+  raycaster: THREE.raycaster;
+  mouse: THREE.Vector2
   clock: THREE.clock;
   camera: THREE.PerspectiveCamera;
   material: THREE.MeshBasicMaterial;
   controls: THREE.TrackballControls;
+  parent: THREE.Object3D
   pivotFrom: THREE.Object3D;
   pivotTo: THREE.Object3D;
   adressParticleSystem: THREE.GPUParticleSystem;
@@ -266,6 +301,10 @@ class Body extends React.Component<Props, State> {
     this.pivotTo.rotation.z += 0.0004;
     this.pivotFrom.rotation.z -= 0.0004;
 
+    if (INTERSECTED) {
+      const actualPos = INTERSECTED.parent.getWorldPosition();
+      this.controls.target = new THREE.Vector3(actualPos.x, actualPos.y, actualPos.z);
+    }
     // ParticleSystem
     this.spawnParticle();
 
@@ -294,14 +333,16 @@ class Body extends React.Component<Props, State> {
         </div>
         <div style={{ flex: 7 }}>
           {
-          renderIf(isLoading)(<div
-            className={styles.loader}
-          >
-            <Lottie
-              options={config}
-              isStopped={!isLoading}
-            />
-          </div>)
+          // eslint-disable-next-line function-paren-newline
+          renderIf(isLoading)(
+            <div
+              className={styles.loader}
+            >
+              <Lottie
+                options={config}
+                isStopped={!isLoading}
+              />
+            </div>)
         }
           <div
             className={styles.draw}
