@@ -24,13 +24,15 @@ const TRESHOLDOFFSET = 3;
 const SCALEMAX = 3;
 const SCALEMIN = 0.5;
 const SCALEZERO = 0.2;
+const FOCUSEDSCALE = 1.2;
 let INTERSECTED;
+let FOCUSED;
 
 // Lerping
 let t = 0;
 let dt = 0.01;
-const lerp = (a, b, c) => a + (b - a) * c;
-const ease = c => (c < 0.5 ? 2 * c * c : -1 + (4 - 2 * c) * c);
+const lerp = (a, b, c) => a + ((b - a) * c);
+const ease = c => (c < 0.5 ? 2 * c * c : -1 + ((4 - (2 * c)) * c));
 
 const createAdressModel = (account: string = 'None', value: number, status: string, from: boolean) => {
   let treshold = 3;
@@ -91,16 +93,16 @@ class Body extends React.Component<Props, State> {
       1000,
     );
     camera.position.set(0, 181, 77);
-    // camera.position.z -= 20;
 
     //  Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setClearColor('#000000');
+    renderer.setClearColor('#FFFFFF');
     renderer.setSize(width, height);
 
     //    Controls
     const controls = new TrackballControls(camera, this.mount);
-
+    controls.maxDistance = 1000;
+    controls.minDistance = 10;
     //  Lights
     const light = new THREE.PointLight('#FFFFFF', 1, 0, 2);
     light.position.set(0, 250, 0);
@@ -138,12 +140,16 @@ class Body extends React.Component<Props, State> {
     const parent = new THREE.Object3D();
     scene.add(parent);
     const pivotFrom = new THREE.Object3D();
+    pivotFrom.name = 'from';
     parent.add(pivotFrom);
     const pivotTo = new THREE.Object3D();
+    pivotTo.name = 'to';
     const testadress = createAdressModel('none', 5, 'success', false);
-    pivotTo.add(testadress);
-    pivotTo.add(adressParticleSystem);
+    //  pivotTo.add(testadress);
+    // pivotTo.add(adressParticleSystem);
+    // pivotFrom.add(adressParticleSystem);
     parent.add(pivotTo);
+    scene.add(adressParticleSystem);
 
     //    Central sphere
     const geometry = new THREE.SphereGeometry(2, 16, 8);
@@ -151,7 +157,6 @@ class Body extends React.Component<Props, State> {
     const mesh1 = new THREE.Mesh(geometry, material1);
 
     parent.add(mesh1);
-    // scene.add(new THREE.AxesHelper(20));
 
     //    Assign to this
     this.scene = scene;
@@ -174,19 +179,21 @@ class Body extends React.Component<Props, State> {
     //    Starting
     this.mount.appendChild(this.renderer.domElement);
     this.mount.addEventListener('mousedown', this.onDocumentMouseDown, false);
+    this.mount.addEventListener('mousemove', this.onDocumentMouseMove, false);
     this.start();
   }
 
   componentDidUpdate() {
-    while (this.pivotFrom.children.length || this.pivotTo.children.length) {
-      if (this.pivotFrom.length) {
-        this.pivotFrom.remove(this.pivotFrom.children[0]);
-      }
-      if (this.pivotTo.length) {
-        this.pivotTo.remove(this.pivotTo.children[0]);
-      }
+    INTERSECTED = null;
+    while (this.pivotFrom.children.length) {
+      this.pivotFrom.remove(this.pivotFrom.children[0]);
+    }
+    while (this.pivotTo.children.length) {
+      this.pivotTo.remove(this.pivotTo.children[0]);
     }
     if (!this.pivotFrom.children.length && !this.pivotTo.children.length) {
+      // this.pivotFrom.add(this.adressParticleSystem);
+      // this.pivotTo.add(this.adressParticleSystem);
       const { data } = this.props.input;
       if (Object.keys(data).length !== 0 && data.constructor === Object) {
         const { from, to } = data;
@@ -206,38 +213,73 @@ class Body extends React.Component<Props, State> {
     this.mount.removeChild(this.renderer.domElement);
   }
 
+  onDocumentMouseMove: Function = (event) => {
+    if (INTERSECTED) {
+      this.mouse.x = (event.offsetX - (this.mount.clientWidth / 2)) / 3;
+      this.mouse.y = (event.offsetY - (this.mount.clientHeight / 2)) / 3;
+    } else {
+      this.mouse.x = (((event.offsetX) / this.mount.clientWidth) * 2) - 1;
+      this.mouse.y = (-((event.offsetY) / this.mount.clientHeight) * 2) + 1;
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+      if (intersects.length > 0) {
+        if (FOCUSED !== intersects[0].object) {
+          if (FOCUSED !== null) {
+            FOCUSED.parent.scale.divideScalar(FOCUSEDSCALE);
+          }
+          FOCUSED = intersects[0].object;
+          FOCUSED.parent.scale.multiplyScalar(FOCUSEDSCALE);
+        }
+      } else {
+        FOCUSED
+          ? FOCUSED.parent.scale.divideScalar(FOCUSEDSCALE)
+          : FOCUSED = null;
+        FOCUSED = null;
+      }
+    }
+  }
+
   onDocumentMouseDown: Function = (event) => {
     event.preventDefault();
-    this.mouse.x = ((event.offsetX - 5) / this.mount.clientHeight) * 2 - 1;
-    this.mouse.y = -((event.offsetY + 15) / this.mount.clientWidth) * 2 + 1;
+    this.mouse.x = (((event.offsetX) / this.mount.clientWidth) * 2) - 1;
+    this.mouse.y = (-((event.offsetY) / this.mount.clientHeight) * 2) + 1;
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const arrow = new THREE.ArrowHelper(this.raycaster.ray.direction, this.raycaster.ray.origin, 1000, 0xffff00);
-    this.scene.add(arrow);
-    const intersects = this.raycaster.intersectObjects(this.pivotTo.children, true);
+    // const arrow = new THREE.ArrowHelper(this.raycaster.ray.direction,
+    // this.raycaster.ray.origin, 1000, 0xffff00);
+    // this.scene.add(arrow);
+    const intersects = this.raycaster.intersectObjects(this.scene.children, true);
     if (intersects.length > 0) {
       if (INTERSECTED !== intersects[0].object) {
         INTERSECTED = intersects[0].object;
         const actualPos = INTERSECTED.parent.getWorldPosition();
         this.controls.target = new THREE.Vector3(actualPos.x, actualPos.y, actualPos.z);
+        this.controls.enabled = false;
       }
     } else {
+      FOCUSED
+        ? FOCUSED.parent.scale.divideScalar(FOCUSEDSCALE)
+        : FOCUSED = null;
+      FOCUSED = null;
       INTERSECTED = null;
       this.controls.target = new THREE.Vector3(0, 0, 0);
+      this.controls.enabled = true;
     }
   };
 
-  spawnParticle = () => {
+  spawnParticle = (object, pivotName: string) => {
     // Apply lerp to adress with Particle
+    const objWorldPos = object.getWorldPosition();
     const a = {
-      x: this.testadress.position.x,
-      y: this.testadress.position.y,
-      z: this.testadress.position.z,
+      x: objWorldPos.x,
+      y: objWorldPos.y,
+      z: objWorldPos.z,
     };
     const b = {
       x: 0,
       y: 0,
       z: 0,
     };
+    // If not INTERSECTED == TRUE, dispatch all particle in random
     const newX = lerp(a.x, b.x, ease(t));
     const newY = lerp(a.y, b.y, ease(t));
     const newZ = lerp(a.z, b.z, ease(t));
@@ -253,9 +295,8 @@ class Body extends React.Component<Props, State> {
     if (this.tick < 0) {
       this.tick = 0;
     }
-    const colors = [0x000000, 0x000000, 0x64A6BD];
     if (delta > 0) {
-      this.adressParticleOptions.color = colors[Math.floor(Math.random() * 3)];
+      this.adressParticleOptions.color = pivotName === 'to' ? 0x546A7B : 0xD81E5B;
       for (let x = 0; x < this.adressSpawnerParticleOptions.spawnRate * delta; x += 1) {
         this.adressParticleSystem.spawnParticle(this.adressParticleOptions);
       }
@@ -302,12 +343,14 @@ class Body extends React.Component<Props, State> {
     this.pivotFrom.rotation.z -= 0.0004;
 
     if (INTERSECTED) {
+      const { name } = INTERSECTED.parent.parent;
       const actualPos = INTERSECTED.parent.getWorldPosition();
       this.controls.target = new THREE.Vector3(actualPos.x, actualPos.y, actualPos.z);
+      this.camera.position.x += (this.mouse.x - this.camera.position.x) * 0.05;
+      this.camera.position.y += (-this.mouse.y - this.camera.position.y) * 0.05;
+      this.spawnParticle(INTERSECTED.parent, name);
     }
     // ParticleSystem
-    this.spawnParticle();
-
     this.controls.update();
     this.frameId = window.requestAnimationFrame(this.animate);
     this.renderScene();
@@ -346,14 +389,18 @@ class Body extends React.Component<Props, State> {
         }
           <div
             className={styles.draw}
-            ref={(mount) => { this.mount = mount; }}
+            ref={(mount) => {
+              if (mount) {
+                const tmp: HTMLDivElement = mount;
+                this.mount = tmp;
+              }
+            }}
           />
         </div>
       </div>
     );
   }
 }
-
 
 const mapStateToProps = ({ input }) => ({
   input,
