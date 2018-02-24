@@ -2,6 +2,7 @@
 
 import React from 'react';
 import * as THREE from 'three';
+import TWEEN from '@tweenjs/tween.js';
 import { connect } from 'react-redux';
 import Lottie from 'react-lottie';
 import type { InputState } from 'reduxTypes/input';
@@ -25,12 +26,15 @@ const SCALEMAX = 3;
 const SCALEMIN = 0.5;
 const SCALEZERO = 0.2;
 const FOCUSEDSCALE = 1.2;
+const CAMERAPOS = { x: 0, y: 180, z: 50 };
 let INTERSECTED;
 let FOCUSED;
 
 // Lerping
 let t = 0;
 let dt = 0.01;
+let tt = 0;
+const dtt = 0.01;
 const lerp = (a, b, c) => a + ((b - a) * c);
 const ease = c => (c < 0.5 ? 2 * c * c : -1 + ((4 - (2 * c)) * c));
 
@@ -92,8 +96,7 @@ class Body extends React.Component<Props, State> {
       1,
       1000,
     );
-    camera.position.set(0, 181, 77);
-
+    camera.position.set(CAMERAPOS.x, CAMERAPOS.y, CAMERAPOS.z);
     //  Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setClearColor('#FFFFFF');
@@ -101,8 +104,9 @@ class Body extends React.Component<Props, State> {
 
     //    Controls
     const controls = new TrackballControls(camera, this.mount);
-    controls.maxDistance = 1000;
+    controls.maxDistance = 800;
     controls.minDistance = 10;
+
     //  Lights
     const light = new THREE.PointLight('#FFFFFF', 1, 0, 2);
     light.position.set(0, 250, 0);
@@ -145,9 +149,7 @@ class Body extends React.Component<Props, State> {
     const pivotTo = new THREE.Object3D();
     pivotTo.name = 'to';
     const testadress = createAdressModel('none', 5, 'success', false);
-    //  pivotTo.add(testadress);
-    // pivotTo.add(adressParticleSystem);
-    // pivotFrom.add(adressParticleSystem);
+    pivotFrom.add(testadress);
     parent.add(pivotTo);
     scene.add(adressParticleSystem);
 
@@ -192,8 +194,6 @@ class Body extends React.Component<Props, State> {
       this.pivotTo.remove(this.pivotTo.children[0]);
     }
     if (!this.pivotFrom.children.length && !this.pivotTo.children.length) {
-      // this.pivotFrom.add(this.adressParticleSystem);
-      // this.pivotTo.add(this.adressParticleSystem);
       const { data } = this.props.input;
       if (Object.keys(data).length !== 0 && data.constructor === Object) {
         const { from, to } = data;
@@ -256,14 +256,50 @@ class Body extends React.Component<Props, State> {
         this.controls.enabled = false;
       }
     } else {
-      FOCUSED
-        ? FOCUSED.parent.scale.divideScalar(FOCUSEDSCALE)
-        : FOCUSED = null;
+      if (FOCUSED) {
+        FOCUSED.parent.scale.divideScalar(FOCUSEDSCALE);
+      }
+      if (INTERSECTED) {
+        this.unfocus();
+      }
       FOCUSED = null;
       INTERSECTED = null;
-      this.controls.target = new THREE.Vector3(0, 0, 0);
-      this.controls.enabled = true;
     }
+  };
+
+  unfocus = () => {
+    const target = {
+      x: CAMERAPOS.x,
+      y: CAMERAPOS.y,
+      z: CAMERAPOS.z,
+    };
+
+    const startQuaternion = this.camera.quaternion.clone();
+    const dummyCamera = this.camera.clone();
+    tt = 0;
+    new TWEEN.Tween(this.camera.position)
+      .to(target, 1000)
+      .easing(TWEEN.Easing.Cubic.Out)
+      .onUpdate((timestamp) => {
+        // Smooth to Camera Start Position angle
+        THREE.Quaternion.slerp(
+          startQuaternion, dummyCamera.quaternion,
+          this.camera.quaternion, timestamp,
+        );
+        // Smooth to Camera Start Target look
+        tt += dtt;
+        this.controls.target.x = lerp(this.controls.target.x, 0, ease(tt));
+        this.controls.target.y = lerp(this.controls.target.y, 0, ease(tt));
+        this.controls.target.z = lerp(this.controls.target.z, 0, ease(tt));
+      })
+      .onComplete(() => {
+        this.controls = null;
+        const controls = new TrackballControls(this.camera, this.mount);
+        controls.maxDistance = 800;
+        controls.minDistance = 10;
+        this.controls = controls;
+      })
+      .start();
   };
 
   spawnParticle = (object, pivotName: string) => {
@@ -279,7 +315,7 @@ class Body extends React.Component<Props, State> {
       y: 0,
       z: 0,
     };
-    // If not INTERSECTED == TRUE, dispatch all particle in random
+    // If not INTERSECTED == TRUE, dispatch all particle in random ?
     const newX = lerp(a.x, b.x, ease(t));
     const newY = lerp(a.y, b.y, ease(t));
     const newZ = lerp(a.z, b.z, ease(t));
@@ -322,6 +358,7 @@ class Body extends React.Component<Props, State> {
   tick: number
   frameId: number;
 
+  tween: any;
   testadress: any;
   start: Function;
   stop: Function;
@@ -337,23 +374,28 @@ class Body extends React.Component<Props, State> {
     window.cancelAnimationFrame(this.frameId);
   }
 
-  animate() {
+  animate(time) {
     // Rotation From / To
     this.pivotTo.rotation.z += 0.0004;
     this.pivotFrom.rotation.z -= 0.0004;
 
+    TWEEN.update(time);
+    if (this.controls) {
+      this.controls.update();
+    }
     if (INTERSECTED) {
       const { name } = INTERSECTED.parent.parent;
       const actualPos = INTERSECTED.parent.getWorldPosition();
       this.controls.target = new THREE.Vector3(actualPos.x, actualPos.y, actualPos.z);
       this.camera.position.x += (this.mouse.x - this.camera.position.x) * 0.05;
       this.camera.position.y += (-this.mouse.y - this.camera.position.y) * 0.05;
+      this.camera.position.z += ((this.mouse.x + this.camera.position.x) + (-this.mouse.y)) * 0.001;
+
+      // ParticleSystem
       this.spawnParticle(INTERSECTED.parent, name);
     }
-    // ParticleSystem
-    this.controls.update();
-    this.frameId = window.requestAnimationFrame(this.animate);
     this.renderScene();
+    this.frameId = window.requestAnimationFrame(this.animate);
   }
 
   renderScene() {
