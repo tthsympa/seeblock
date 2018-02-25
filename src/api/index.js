@@ -31,12 +31,14 @@ const getTxByAdress = async (adress: string) => {
           txs.from = txs.from.push({
             adress: tx.from,
             value: tx.value / WEI,
+            bTimestamp: block.timestamp,
             status: tx.blockHash ? 'success' : 'pending',
           });
         } else if (tx.from === adress) {
           txs.to = txs.to.push({
             adress: tx.to,
             value: tx.value / WEI,
+            bTimestamp: block.timestamp,
             status: tx.blockHash ? 'success' : 'pending',
           });
         }

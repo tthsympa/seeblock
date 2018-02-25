@@ -29,16 +29,30 @@ const FOCUSEDSCALE = 1.2;
 const CAMERAPOS = { x: 0, y: 180, z: 50 };
 let INTERSECTED;
 let FOCUSED;
+let CURRENTTIMESTAMP;
 
-// Lerping
 let t = 0;
 let dt = 0.01;
 let tt = 0;
 const dtt = 0.01;
+
 const lerp = (a, b, c) => a + ((b - a) * c);
 const ease = c => (c < 0.5 ? 2 * c * c : -1 + ((4 - (2 * c)) * c));
+const isBetween = (x, min, max) => x > min && x <= max;
+const diff = (c, b) => c - b;
 
-const createAdressModel = (account: string = 'None', value: number, status: string, from: boolean) => {
+// Salut Théotime, maintenant il faut faire les vecteurs en fonction des ranges base-max... Bonne chance !
+const posBasedOnTimestamp = (bTimestamp: number, base: number) => {
+  const max = base + 5;
+  isBetween(diff(CURRENTTIMESTAMP, bTimestamp), base, max)
+    ? console.log('between : ', base, max)
+    : max >= 100
+      ? console.log('au dessus dune minute')
+      : posBasedOnTimestamp(bTimestamp, max);
+};
+
+const createAdressModel = (account: string = 'None', txInfos, from: boolean) => {
+  const { value, status, bTimestamp } = txInfos;
   let treshold = 3;
   let step = 1;
   let scale = 0;
@@ -57,6 +71,8 @@ const createAdressModel = (account: string = 'None', value: number, status: stri
   const adress = new AdressModel(status, step > 8 ? '8' : step.toString());
   adress.name = account;
   adress.scale.multiplyScalar(scale);
+
+  posBasedOnTimestamp(bTimestamp, 0);
 
   let randX = Math.random();
   let randZ = Math.random();
@@ -148,8 +164,8 @@ class Body extends React.Component<Props, State> {
     parent.add(pivotFrom);
     const pivotTo = new THREE.Object3D();
     pivotTo.name = 'to';
-    const testadress = createAdressModel('none', 5, 'success', false);
-    pivotFrom.add(testadress);
+    // const testadress = createAdressModel('none', 5, 'success', false);
+    // pivotFrom.add(testadress);
     parent.add(pivotTo);
     scene.add(adressParticleSystem);
 
@@ -177,7 +193,7 @@ class Body extends React.Component<Props, State> {
     this.adressSpawnerParticleOptions = adressSpawnerParticleOptions;
 
     //    test
-    this.testadress = testadress;
+    // this.testadress = testadress;
     //    Starting
     this.mount.appendChild(this.renderer.domElement);
     this.mount.addEventListener('mousedown', this.onDocumentMouseDown, false);
@@ -187,6 +203,7 @@ class Body extends React.Component<Props, State> {
 
   componentDidUpdate() {
     INTERSECTED = null;
+    CURRENTTIMESTAMP = Math.floor(Date.now() / 1000);
     while (this.pivotFrom.children.length) {
       this.pivotFrom.remove(this.pivotFrom.children[0]);
     }
@@ -197,12 +214,12 @@ class Body extends React.Component<Props, State> {
       const { data } = this.props.input;
       if (Object.keys(data).length !== 0 && data.constructor === Object) {
         const { from, to } = data;
-        to.forEach((v) => {
-          this.pivotTo.add(createAdressModel(data.adress, v.value, v.status, false));
+        to.forEach((txInfos) => {
+          this.pivotTo.add(createAdressModel(data.adress, txInfos, false));
         });
 
-        from.forEach((v) => {
-          this.pivotFrom.add(createAdressModel(data.adress, v.value, v.status, true));
+        from.forEach((txInfos) => {
+          this.pivotFrom.add(createAdressModel(data.adress, txInfos, true));
         });
       }
     }
