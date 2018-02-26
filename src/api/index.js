@@ -2,7 +2,7 @@
 
 import Web3 from 'web3';
 import { TYPE, STARTBLOCKOFFSET, WEI, LOCALHOST } from 'config/constants';
-import type { Input } from 'reduxTypes/input';
+import type { Input, AdressDatas } from 'reduxTypes/input';
 import { List } from 'immutable';
 
 const getWeb3Object = () => new Web3(Web3.givenProvider || LOCALHOST);
@@ -13,7 +13,7 @@ const getBlockDatas = (blockNumber: number): Promise<Web3.Block> => {
 };
 
 const getTxByAdress = async (adress: string) => {
-  const txs = {
+  const txs: AdressDatas = {
     adress,
     count: 0,
     from: List(),
@@ -31,13 +31,15 @@ const getTxByAdress = async (adress: string) => {
           txs.from = txs.from.push({
             adress: tx.from,
             value: tx.value / WEI,
-            pending: tx.blockHash ? false : true,
+            bTimestamp: block.timestamp,
+            status: tx.blockHash ? 'success' : 'pending',
           });
         } else if (tx.from === adress) {
           txs.to = txs.to.push({
             adress: tx.to,
             value: tx.value / WEI,
-            pending: tx.blockHash ? false : true,
+            bTimestamp: block.timestamp,
+            status: tx.blockHash ? 'success' : 'pending',
           });
         }
       });
