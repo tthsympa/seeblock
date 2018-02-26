@@ -21,8 +21,9 @@ type State = {
 
 }
 
-const TRESHOLDOFFSET = 3;
-const SCALEMAX = 3;
+const TRESHOLDOFFSET = 6;
+const RANGEOFFSET = 2;
+const SCALEMAX = 6;
 const SCALEMIN = 0.5;
 const SCALEZERO = 0.2;
 const FOCUSEDSCALE = 1.2;
@@ -41,13 +42,19 @@ const ease = c => (c < 0.5 ? 2 * c * c : -1 + ((4 - (2 * c)) * c));
 const isBetween = (x, min, max) => x > min && x <= max;
 const diff = (c, b) => c - b;
 
-// Salut Théotime, maintenant il faut faire les vecteurs en fonction des ranges base-max... Bonne chance !
 const posBasedOnTimestamp = (bTimestamp: number, base: number) => {
-  const max = base + 5;
-  isBetween(diff(CURRENTTIMESTAMP, bTimestamp), base, max)
-    ? console.log('between : ', base, max)
+  const newVectorInRange = (min: number, max: number, res: number) => {
+    const randX = ((Math.random() * (res - 0)) + 0) / 100;
+    const randY = ((Math.random() * (res - 0)) + 0) / 100;
+    const randZ = ((Math.random() * ((max + 8) - (min - 8))) + (min - 8)) / 100;
+    return { vByTime: new THREE.Vector3(randX, randY, randZ), max };
+  };
+  const max = base + RANGEOFFSET;
+  const res = diff(CURRENTTIMESTAMP, bTimestamp);
+  return isBetween(res, base, max)
+    ? newVectorInRange(base, max, res)
     : max >= 100
-      ? console.log('au dessus dune minute')
+      ? newVectorInRange(base, max, max)
       : posBasedOnTimestamp(bTimestamp, max);
 };
 
@@ -72,17 +79,11 @@ const createAdressModel = (account: string = 'None', txInfos, from: boolean) => 
   adress.name = account;
   adress.scale.multiplyScalar(scale);
 
-  posBasedOnTimestamp(bTimestamp, 0);
-
-  let randX = Math.random();
-  let randZ = Math.random();
-  let randY = Math.random();
-  randX = randX <= 0.2 ? 0.5 : randX;
-  randZ = randZ <= 0.2 ? 0.5 : randZ;
-  randY = randY <= 0.2 ? 0.5 : randY;
-  adress.position.x = (randX * 200) - 100;
-  adress.position.z = from ? -(randZ * 100) : (randZ * 100);
-  adress.position.y = (randY * 200) - 100;
+  const obj = posBasedOnTimestamp(bTimestamp, 0);
+  const { vByTime, max } = obj;
+  adress.position.x = (vByTime.x * (100 + max)) - max;
+  adress.position.z = from ? -(vByTime.z * 100) : (vByTime.z * 100);
+  adress.position.y = (vByTime.y * (100 + max)) - max;
 
   return adress;
 };
@@ -254,7 +255,7 @@ class Body extends React.Component<Props, State> {
         FOCUSED = null;
       }
     }
-  }
+  };
 
   onDocumentMouseDown: Function = (event) => {
     event.preventDefault();
