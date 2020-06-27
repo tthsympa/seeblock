@@ -1,11 +1,11 @@
 // @flow
 
-import React from 'react';
-import type { Node } from 'react';
-import Divider from 'material-ui/Divider';
-import github from 'assets/GitHub-Mark-64px.png';
-import telegram from 'assets/Telegram-64px.png';
-import styles from './Footer.css';
+import React from 'react'
+import type { Node } from 'react'
+import Divider from '@material-ui/core/Divider'
+import github from 'assets/GitHub-Mark-64px.png'
+import telegram from 'assets/Telegram-64px.png'
+import styles from './Footer.css'
 
 const Footer = (): Node => (
   <div className={styles.container}>
@@ -23,19 +23,6 @@ const Footer = (): Node => (
       </form>
     </div>
   </div>
-);
+)
 
-export default Footer;
-// <div className={styles.loading}>
-//           {
-//           renderIf(isLoading)(<Lottie
-//             options={this.defaultOptions}
-//             isStopped={!isLoading}
-//           />)
-//           }
-//         </div>
-//  defaultOptions = {
-//   loop: true,
-//   autoplay: false,
-//   animationData,
-// };
+export default Footer

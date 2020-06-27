@@ -1,14 +1,14 @@
 // @flow
 
 import React from 'react';
-import Typography from 'material-ui/Typography';
+import Typography from '@material-ui/core/Typography'
 import styles from './Title.css';
 
 const Title = () => (
   <div className={styles.title}>
     <Typography
       align="center"
-      variant="display2"
+      variant="h1"
       color="secondary"
     >
       seeblock

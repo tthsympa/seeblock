@@ -2,7 +2,7 @@
 
 import React from 'react';
 import type { Node } from 'react';
-import TextField from 'material-ui/TextField';
+import TextField from '@material-ui/core/TextField';
 import styles from './SearchBar.css';
 
 type Props = {
@@ -16,7 +16,7 @@ const SearchBar = ({ inputError, verifyInput, go }: Props): Node => (
     <TextField
       id="search"
       label="Adress / Block"
-      fullWidth
+      width="90%"
       error={inputError}
       onChange={changeEvent => (verifyInput(
         changeEvent.target.value,

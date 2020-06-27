@@ -16,13 +16,11 @@
           "assets": "./src/assets",
           "components": "./src/components",
           "config": "./src/config",
-          "containers": "./src/containers",
           "reducers": "./src/reducers",
           "reduxTypes": "./src/reduxTypes",
           "sagas": "./src/sagas",
-          "services": "./src/services",
-          "styles": "./src/styles",
-          "utils": "./src/utils"
+          "helpers": "./src/helpers",
+          "sections": "./src/sections"
         }
       }
     ],

@@ -1,4 +1,5 @@
 .search {
+  display: flex;
   flex: 3;
-  margin-left: 10px;
+  justify-content: center;
 }

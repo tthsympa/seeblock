@@ -1,21 +1,21 @@
 // @flow
 
-import React from 'react';
-import { render } from 'react-dom';
-import { Provider } from 'react-redux';
-import { MuiThemeProvider } from 'material-ui/styles';
-import theme from 'utils/colors';
-import store from 'utils/store';
-import Root from 'containers/Views/Root';
+import React from 'react'
+import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import { ThemeProvider } from '@material-ui/styles'
+import theme from 'config/colors'
+import store from 'helpers/store'
+import Root from 'sections/Root'
 
 /* global  document:true */
 
 render(
   <Provider store={store}>
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <Root />
-    </MuiThemeProvider>
+    </ThemeProvider>
   </Provider>,
   // $FlowFixMe
-  document.getElementById('app'),
-);
+  document.getElementById('app')
+)
