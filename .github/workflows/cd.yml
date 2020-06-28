@@ -1,0 +1,46 @@
+name: Node CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v1
+        with:
+          username: nologin
+          password: ${{ secrets.SCW_SECRET_TOKEN }}
+          registry: rg.fr-par.scw.cloud
+          repository: tthsympa/seeblock
+          tags: latest
+
+  deploy:
+    name: Deploy Docker image
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy & run throught SSH
+        uses: fifsky/ssh-action@v0.0.4
+        env:
+          REGISTRY: rg.fr-par.scw.cloud
+          TOKEN: ${{ secrets.SCW_SECRET_TOKEN }}
+          PORT: 8080
+        with:
+          command: |
+            docker login ${{ env.REGISTRY }}/tthsympa -u nologin -p ${{ env.TOKEN }}
+            docker pull ${{ env.REGISTRY }}/tthsympa/seeblock:latest
+            docker container stop tthsympa_seeblock
+            docker container rm tthsympa_seeblock
+            docker run -d --name tthsympa_seeblock -p ${{ env.PORT }}:${{ env.PORT }} ${{ env.REGISTRY }}/tthsympa/seeblock:latest
+          host: ${{ secrets.REMOTE_HOST }}
+          user: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}

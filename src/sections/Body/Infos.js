@@ -6,6 +6,7 @@ import TWEEN from '@tweenjs/tween.js'
 import { connect } from 'react-redux'
 import Lottie from 'react-lottie'
 import Typography from '@material-ui/core/Typography'
+import Link from '@material-ui/core/Link'
 import Divider from '@material-ui/core/Divider'
 import type { InputState } from 'reduxTypes/input'
 import TrackballControls from 'helpers/TrackballControls'
@@ -65,7 +66,7 @@ class Infos extends React.Component<Props, State> {
         {txInfos && (
           <React.Fragment>
             <Divider />
-            <div className={styles.infos_general}>
+            <div className={styles.infos_address}>
               <Typography variant="h5" color="primary">
                 {txInfos.from ? 'Incoming' : 'Outgoing'} transaction
               </Typography>
@@ -97,6 +98,17 @@ class Infos extends React.Component<Props, State> {
                   {new Date(txInfos.bTimestamp * 1000).toLocaleDateString()}
                 </Typography>
               </Typography>
+            </div>
+            <Divider />
+            <div className={styles.infos_etherscan}>
+              <Link
+                href={`https://etherscan.io/tx/${txInfos.id}`}
+                target="_blank"
+                rel="noopener"
+                rel="noreferrer"
+              >
+                Watch it on etherscan
+              </Link>
             </div>
           </React.Fragment>
         )}

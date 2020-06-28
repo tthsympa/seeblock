@@ -4,14 +4,14 @@
   "description": "Visual interpretation of what happen in a blockchain",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "flow": "flow --show-all-errors ; printf \"\\033[0;31m‼️  Ignore all node_modules errors ‼️\\033[0m\n\"",
-    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js",
-    "geth": "geth --syncmode \"light\" --rpc --rpccorsdomain \"http://localhost:8080\""
+    "dev": "NODE_ENV=development webpack-dev-server --env.NODE_ENV=development --config ./webpack/webpack.dev.js",
+    "build": "cp -R public/ build/ && NODE_ENV=production webpack --progress --config ./webpack/webpack.prod.js",
+    "serve": "yarn build && serve build/ -l 8080"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TTHledieu/seeblock.git"
+    "url": "git+https://github.com/tthsympa/seeblock.git"
   },
   "keywords": [
     "blockchain",
@@ -19,19 +19,19 @@
     "threejs",
     "eth"
   ],
-  "author": "TTH & JC",
+  "author": "TTH",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/TTHledieu/seeblock/issues"
+    "url": "https://github.com/tthsympa/seeblock"
   },
-  "homepage": "https://github.com/TTHledieu/seeblock#readme",
+  "homepage": "https://github.com/tthsympa/seeblock#readme",
   "dependencies": {
+    "@material-ui/core": "^4.9.5",
     "@tweenjs/tween.js": "^17.2.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "flow-bin": "^0.75.0",
     "immutable": "^3.8.2",
-    "@material-ui/core": "^4.9.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-lottie": "^1.0.0",
@@ -41,8 +41,8 @@
     "redux-saga": "^0.16.0",
     "three": "^0.90.0",
     "web3": "^1.0.0-beta.30",
-    "webpack": "^3.11.0",
-    "webpack-dev-server": "^2.11.1"
+    "webpack": "^4.43.0",
+    "webpack-dev-server": "^3.11.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -68,6 +68,14 @@
     "file-loader": "^1.1.6",
     "less": "^2.3.1",
     "less-loader": "^4.0.5",
-    "style-loader": "^0.20.1"
+    "style-loader": "^0.20.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-merge": "^4.2.2"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true
+    }
   }
 }

@@ -6,6 +6,7 @@ import TWEEN from '@tweenjs/tween.js'
 import { connect } from 'react-redux'
 import Lottie from 'react-lottie'
 import type { InputState } from 'reduxTypes/input'
+import type { Web3ObjectState } from 'reduxTypes/web3'
 import TrackballControls from 'helpers/TrackballControls'
 import GPUParticleSystem from 'helpers/GPUParticleSystem'
 import AddressModel from 'helpers/AddressModel'
@@ -15,6 +16,7 @@ import styles from './Body.css'
 
 type Props = {
   input: InputState,
+  web3: Web3ObjectState,
 }
 
 type State = {
@@ -222,11 +224,15 @@ class Body extends React.Component<Props, State> {
         if (Object.keys(data).length !== 0 && data.constructor === Object) {
           const { from, to } = data
           to.forEach((txInfos) => {
-            this.pivotTo.add(createAddressModel(txInfos.address, txInfos, false))
+            this.pivotTo.add(
+              createAddressModel(txInfos.address, txInfos, false)
+            )
           })
 
           from.forEach((txInfos) => {
-            this.pivotFrom.add(createAddressModel(txInfos.address, txInfos, true))
+            this.pivotFrom.add(
+              createAddressModel(txInfos.address, txInfos, true)
+            )
           })
         }
       }
@@ -289,9 +295,7 @@ class Body extends React.Component<Props, State> {
         )
         this.controls.enabled = false
         this.scene.add(this.addressParticleSystem)
-        console.log(INTERSECTED)
-        console.log(this.pivotFrom)
-        console.log(this.pivotTo)
+
         if (INTERSECTED) {
           const { uuid, name } = INTERSECTED || {}
           if (name !== 'origin') {
@@ -359,12 +363,18 @@ class Body extends React.Component<Props, State> {
 
     // Remove Particle system if no focus
     this.scene.remove(this.addressParticleSystem)
-    // this.selectedAddress = ''
+
+    // Unselect the current address
+    this.setState({
+      selectedAddress: '',
+    })
   }
 
-  spawnParticle = (object, pivotName: string) => {
+  spawnParticle = (object) => {
     // Apply lerp to address with Particle
     const objWorldPos = object.getWorldPosition()
+    const parentName = (object.parent || {}).name
+
     const a = {
       x: objWorldPos.x,
       y: objWorldPos.y,
@@ -394,7 +404,7 @@ class Body extends React.Component<Props, State> {
     }
     if (delta > 0) {
       this.addressParticleOptions.color =
-        pivotName === 'to' ? 0xf6ebd7 : 0xdef4ee
+        parentName === 'to' ? 0xf6ebd7 : 0xdef4ee
       for (
         let x = 0;
         x < this.addressSpawnerParticleOptions.spawnRate * delta;
@@ -462,7 +472,7 @@ class Body extends React.Component<Props, State> {
         (this.mouse.x + this.camera.position.x + -this.mouse.y) * 0.001
 
       // ParticleSystem
-      this.spawnParticle(INTERSECTED.parent, name)
+      this.spawnParticle(INTERSECTED.parent)
     }
     this.renderScene()
     this.frameId = window.requestAnimationFrame(this.animate)
@@ -488,21 +498,23 @@ class Body extends React.Component<Props, State> {
           selectedAddress={this.state.selectedAddress}
         />
         <div className={styles.content_canvas}>
-          {isLoading && (
-            <div className={styles.loader}>
-              <Lottie options={config} isStopped={!isLoading} />
-            </div>
-          )}
-          <div
-            style={{ display: isLoading ? 'none' : 'block' }}
-            className={styles.canvas}
-            ref={(mount) => {
-              if (mount) {
-                const tmp: HTMLDivElement = mount
-                this.mount = tmp
-              }
-            }}
-          />
+          <React.Fragment>
+            {isLoading && (
+              <div className={styles.loader}>
+                <Lottie options={config} isStopped={!isLoading} />
+              </div>
+            )}
+            <div
+              style={{ display: isLoading ? 'none' : 'block' }}
+              className={styles.canvas}
+              ref={(mount) => {
+                if (mount) {
+                  const tmp: HTMLDivElement = mount
+                  this.mount = tmp
+                }
+              }}
+            />
+          </React.Fragment>
         </div>
       </div>
     )

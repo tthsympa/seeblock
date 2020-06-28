@@ -1,11 +1,11 @@
 // @flow
 
 import Web3 from 'web3'
-import { TYPE, STARTBLOCKOFFSET, WEI, LOCALHOST } from 'config/constants'
+import { TYPE, STARTBLOCKOFFSET, WEI } from 'config/constants'
 import type { Input, AddressDatas } from 'reduxTypes/input'
 import { List } from 'immutable'
 
-const getWeb3Object = () => new Web3(Web3.givenProvider || LOCALHOST)
+const getWeb3Object = () => new Web3(Web3.givenProvider)
 
 const getBlockDatas = (blockNumber: number): Promise<Web3.Block> => {
   const web3: Web3 = getWeb3Object()
@@ -13,6 +13,7 @@ const getBlockDatas = (blockNumber: number): Promise<Web3.Block> => {
 }
 const getTxData = (tx): Object => {
   return {
+    id: tx.hash,
     value: tx.value / WEI,
     valueInWei: tx.value,
     status: tx.blockHash ? 'success' : 'pending',
@@ -43,12 +44,6 @@ const getTxByBlock = async (blockNumber: number) => {
         address: tx.from,
         bTimestamp: block.timestamp,
         from: true,
-      })
-      txs.to = txs.to.push({
-        ...getTxData(tx),
-        address: tx.to,
-        bTimestamp: block.timestamp,
-        from: false,
       })
     })
   }
