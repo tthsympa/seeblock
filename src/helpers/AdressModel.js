@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import * as THREE from 'three'
 
 const AdressModel = function (status: string, step: string, source: string) {

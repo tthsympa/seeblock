@@ -11,9 +11,20 @@
   justify-content: center;
   border: 1px dashed #c4c4c4;
 }
-.content_infos {
+.infos {
   display: flex;
+  flex-direction: column;
   flex: 3;
+  padding: 16px;
+}
+
+.infos_general {
+  margin: 8px 0;
+  width: 100%;
+}
+.infos_address {
+  margin: 8px 0;
+  width: 100%;
 }
 
 .canvas {

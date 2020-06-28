@@ -14,6 +14,7 @@ const getBlockDatas = (blockNumber: number): Promise<Web3.Block> => {
 const getTxData = (tx): Object => {
   return {
     value: tx.value / WEI,
+    valueInWei: tx.value,
     status: tx.blockHash ? 'success' : 'pending',
     blockHash: tx.blockHash,
     gas: {
@@ -23,9 +24,42 @@ const getTxData = (tx): Object => {
   }
 }
 
+const getTxByBlock = async (blockNumber: number) => {
+  const txs: AdressDatas = {
+    adress: '',
+    block: blockNumber,
+    count: 0,
+    from: List(),
+    to: List(),
+  }
+  const web3: Web3 = getWeb3Object()
+
+  // eslint-disable-next-line no-await-in-loop
+  const block = await getBlockDatas(blockNumber)
+  if (block && block.transactions) {
+    block.transactions.forEach((tx) => {
+      txs.from = txs.from.push({
+        ...getTxData(tx),
+        adress: tx.from,
+        bTimestamp: block.timestamp,
+        from: true,
+      })
+      txs.to = txs.to.push({
+        ...getTxData(tx),
+        adress: tx.to,
+        bTimestamp: block.timestamp,
+        from: false,
+      })
+    })
+  }
+  txs.count = txs.from.size + txs.to.size
+  return txs
+}
+
 const getTxByAdress = async (adress: string) => {
   const txs: AdressDatas = {
     adress,
+    block: -1,
     count: 0,
     from: List(),
     to: List(),
@@ -45,12 +79,14 @@ const getTxByAdress = async (adress: string) => {
             ...getTxData(tx),
             adress: tx.from,
             bTimestamp: block.timestamp,
+            from: true,
           })
         } else if (tx.from === adress) {
           txs.to = txs.to.push({
             ...getTxData(tx),
             adress: tx.to,
             bTimestamp: block.timestamp,
+            from: false,
           })
         }
       })
@@ -63,7 +99,7 @@ const getTxByAdress = async (adress: string) => {
 export const fetchElemFromBC = ({ elem, type }: Input) => {
   switch (type) {
     case TYPE.BLOCK:
-      return getBlockDatas(parseInt(elem, 10))
+      return getTxByBlock(parseInt(elem, 10))
     case TYPE.ADRESS:
       return getTxByAdress(elem)
     default:

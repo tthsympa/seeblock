@@ -17,7 +17,7 @@
  *
  */
 
-// Modified by TTHledieu for seeblock https://github.com/TTHledieu/seeblock
+// Modified by TTH for seeblock https://github.com/tthsympa/seeblock
 
 import * as THREE from 'three';
 import particle3 from 'assets/particle3.png';

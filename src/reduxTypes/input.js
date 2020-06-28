@@ -8,6 +8,7 @@ export type Input = {
 
 export type AdressDatas = {
   adress: string,
+  block: number,
   count: number,
   from: List<*>,
   to: List<*>,

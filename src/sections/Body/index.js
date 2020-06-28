@@ -10,13 +10,16 @@ import TrackballControls from 'helpers/TrackballControls'
 import GPUParticleSystem from 'helpers/GPUParticleSystem'
 import AdressModel from 'helpers/AdressModel'
 import * as animationData from 'assets/eyeball.json'
+import Infos from './Infos'
 import styles from './Body.css'
 
 type Props = {
   input: InputState,
 }
 
-type State = {}
+type State = {
+  selectedAddress: string,
+}
 
 const TRESHOLDOFFSET = 6
 const RANGEOFFSET = 2
@@ -56,7 +59,7 @@ const posBasedOnTimestamp = (bTimestamp: number, base: number) => {
 }
 
 const createAdressModel = (
-  account: string = 'None',
+  id: string | Number = 'None',
   txInfos,
   from: boolean
 ) => {
@@ -81,7 +84,7 @@ const createAdressModel = (
     step > 8 ? '8' : step.toString(),
     from ? 'from' : 'to'
   )
-  adress.name = account
+  adress.name = id
   adress.scale.multiplyScalar(scale)
 
   const obj = posBasedOnTimestamp(bTimestamp, 0)
@@ -95,6 +98,10 @@ const createAdressModel = (
 
 // eslint-disable-next-line react/prefer-stateless-function
 class Body extends React.Component<Props, State> {
+  state: State = {
+    selectedAddress: '',
+  }
+
   constructor(props: Props) {
     super(props)
 
@@ -137,7 +144,7 @@ class Body extends React.Component<Props, State> {
       maxParticles: 2000,
     })
 
-    // options passed during each spawned
+    // options passed during each particle spawn
     const adressParticleOptions = {
       position: new THREE.Vector3(),
       positionRandomness: 0.1,
@@ -146,7 +153,7 @@ class Body extends React.Component<Props, State> {
       color: 0x000000,
       colorRandomness: 0.2,
       turbulence: 0.01,
-      lifetime: 0.2,
+      lifetime: 100,
       size: 1,
       sizeRandomness: 0.5,
     }
@@ -154,7 +161,7 @@ class Body extends React.Component<Props, State> {
       spawnRate: 2000,
       horizontalSpeed: 1.5,
       verticalSpeed: 1.33,
-      timeScale: 2,
+      timeScale: 1,
     }
 
     //    Central sphere & pivot
@@ -165,20 +172,17 @@ class Body extends React.Component<Props, State> {
     parent.add(pivotFrom)
     const pivotTo = new THREE.Object3D()
     pivotTo.name = 'to'
-    // const testadress = createAdressModel('none', 5, 'success', false);
-    // pivotFrom.add(testadress);
     parent.add(pivotTo)
-    scene.add(adressParticleSystem)
 
     //    Central sphere
-    const geometry = new THREE.SphereGeometry(2, 16, 8)
-    const material1 = new THREE.MeshBasicMaterial({
-      color: '#4FDE3D',
+    const originGeometry = new THREE.SphereGeometry(2, 16, 8)
+    const originMaterial = new THREE.MeshBasicMaterial({
+      color: '#29434e',
       wireframe: true,
     })
-    const mesh1 = new THREE.Mesh(geometry, material1)
-
-    parent.add(mesh1)
+    const originMesh = new THREE.Mesh(originGeometry, originMaterial)
+    originMesh.name = 'origin'
+    parent.add(originMesh)
 
     //    Assign to this
     this.scene = scene
@@ -203,26 +207,28 @@ class Body extends React.Component<Props, State> {
     this.start()
   }
 
-  componentDidUpdate() {
-    INTERSECTED = null
-    CURRENTTIMESTAMP = Math.floor(Date.now() / 1000)
-    while (this.pivotFrom.children.length) {
-      this.pivotFrom.remove(this.pivotFrom.children[0])
-    }
-    while (this.pivotTo.children.length) {
-      this.pivotTo.remove(this.pivotTo.children[0])
-    }
-    if (!this.pivotFrom.children.length && !this.pivotTo.children.length) {
-      const { data } = this.props.input
-      if (Object.keys(data).length !== 0 && data.constructor === Object) {
-        const { from, to } = data
-        to.forEach((txInfos) => {
-          this.pivotTo.add(createAdressModel(data.adress, txInfos, false))
-        })
+  componentDidUpdate(prevProps) {
+    if (prevProps.input.isLoading !== this.props.input.isLoading) {
+      INTERSECTED = null
+      CURRENTTIMESTAMP = Math.floor(Date.now() / 1000)
+      while (this.pivotFrom.children.length) {
+        this.pivotFrom.remove(this.pivotFrom.children[0])
+      }
+      while (this.pivotTo.children.length) {
+        this.pivotTo.remove(this.pivotTo.children[0])
+      }
+      if (!this.pivotFrom.children.length && !this.pivotTo.children.length) {
+        const { data } = this.props.input
+        if (Object.keys(data).length !== 0 && data.constructor === Object) {
+          const { from, to } = data
+          to.forEach((txInfos) => {
+            this.pivotTo.add(createAdressModel(txInfos.adress, txInfos, false))
+          })
 
-        from.forEach((txInfos) => {
-          this.pivotFrom.add(createAdressModel(data.adress, txInfos, true))
-        })
+          from.forEach((txInfos) => {
+            this.pivotFrom.add(createAdressModel(txInfos.adress, txInfos, true))
+          })
+        }
       }
     }
   }
@@ -263,12 +269,11 @@ class Body extends React.Component<Props, State> {
 
   onDocumentMouseDown: Function = (event) => {
     event.preventDefault()
+
     this.mouse.x = (event.offsetX / this.mount.clientWidth) * 2 - 1
     this.mouse.y = -(event.offsetY / this.mount.clientHeight) * 2 + 1
     this.raycaster.setFromCamera(this.mouse, this.camera)
-    // const arrow = new THREE.ArrowHelper(this.raycaster.ray.direction,
-    // this.raycaster.ray.origin, 1000, 0xffff00);
-    // this.scene.add(arrow);
+
     const intersects = this.raycaster.intersectObjects(
       this.scene.children,
       true
@@ -283,6 +288,26 @@ class Body extends React.Component<Props, State> {
           actualPos.z
         )
         this.controls.enabled = false
+        this.scene.add(this.adressParticleSystem)
+        console.log(INTERSECTED)
+        console.log(this.pivotFrom)
+        console.log(this.pivotTo)
+        if (INTERSECTED) {
+          const { uuid, name } = INTERSECTED || {}
+          if (name !== 'origin') {
+            const selectedAddress = (
+              this.pivotFrom.children.find(
+                ({ children }) => children[0].uuid === uuid
+              ) ||
+              this.pivotTo.children.find(
+                ({ children }) => children[0].uuid === uuid
+              )
+            ).name
+            this.setState({
+              selectedAddress,
+            })
+          }
+        }
       }
     } else {
       if (FOCUSED) {
@@ -331,6 +356,10 @@ class Body extends React.Component<Props, State> {
         this.controls = controls
       })
       .start()
+
+    // Remove Particle system if no focus
+    this.scene.remove(this.adressParticleSystem)
+    // this.selectedAddress = ''
   }
 
   spawnParticle = (object, pivotName: string) => {
@@ -365,7 +394,7 @@ class Body extends React.Component<Props, State> {
     }
     if (delta > 0) {
       this.adressParticleOptions.color =
-        pivotName === 'to' ? 0x546a7b : 0xd81e5b
+        pivotName === 'to' ? 0xf6ebd7 : 0xdef4ee
       for (
         let x = 0;
         x < this.adressSpawnerParticleOptions.spawnRate * delta;
@@ -396,7 +425,6 @@ class Body extends React.Component<Props, State> {
   frameId: number
 
   tween: any
-  testadress: any
   start: Function
   stop: Function
   animate: Function
@@ -421,7 +449,7 @@ class Body extends React.Component<Props, State> {
       this.controls.update()
     }
     if (INTERSECTED) {
-      const { name } = INTERSECTED.parent.parent
+      const { name } = INTERSECTED.parent
       const actualPos = INTERSECTED.parent.getWorldPosition()
       this.controls.target = new THREE.Vector3(
         actualPos.x,
@@ -455,9 +483,10 @@ class Body extends React.Component<Props, State> {
     const { isLoading } = this.props.input
     return (
       <div className={styles.container}>
-        <div className={styles.content_infos}>
-          <p>left</p>
-        </div>
+        <Infos
+          input={this.props.input}
+          selectedAddress={this.state.selectedAddress}
+        />
         <div className={styles.content_canvas}>
           {isLoading && (
             <div className={styles.loader}>
