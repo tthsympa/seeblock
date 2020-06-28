@@ -6,7 +6,7 @@ import SearchBar from 'components/header/SearchBar';
 import Title from 'components/header/Title';
 import Goal from 'components/header/Goal';
 import { input } from 'actions/input';
-import { TYPE, ADRESSLENGTH } from 'config/constants';
+import { TYPE, ADDRESSLENGTH } from 'config/constants';
 import styles from './Header.css';
 
 type Props = {
@@ -38,11 +38,11 @@ class Header extends React.Component<Props, State> {
   go: Function;
 
   verifyInput = (ipt: string, iptLength: number) => {
-    if (iptLength === ADRESSLENGTH && (/^\w+$/.test(ipt))) {
+    if (iptLength === ADDRESSLENGTH && (/^\w+$/.test(ipt))) {
       this.setState({
         searchInput: ipt,
         inputError: false,
-        type: TYPE.ADRESS,
+        type: TYPE.ADDRESS,
       });
     } else if (/^\d+$/.test(ipt)) {
       this.setState({

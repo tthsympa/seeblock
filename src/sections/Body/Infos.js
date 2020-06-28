@@ -10,7 +10,7 @@ import Divider from '@material-ui/core/Divider'
 import type { InputState } from 'reduxTypes/input'
 import TrackballControls from 'helpers/TrackballControls'
 import GPUParticleSystem from 'helpers/GPUParticleSystem'
-import AdressModel from 'helpers/AdressModel'
+import AddressModel from 'helpers/AddressModel'
 import * as animationData from 'assets/eyeball.json'
 import styles from './Body.css'
 
@@ -21,15 +21,15 @@ type Props = {
 
 type State = {}
 
-function isAddressOrBlock({ adress, block }) {
-  return adress ? 'Address' : block ? 'Block' : ''
+function isAddressOrBlock({ address, block }) {
+  return address ? 'Address' : block ? 'Block' : ''
 }
 
 function getTxInfos({ address, data: { to, from } }) {
   if (!address) return undefined
   return (
-    to.find((infos) => infos.adress === address) ||
-    from.find((infos) => infos.adress === address)
+    to.find((infos) => infos.address === address) ||
+    from.find((infos) => infos.address === address)
   )
 }
 
@@ -58,7 +58,7 @@ class Infos extends React.Component<Props, State> {
           <Typography display="inline" variant="body1" color="secondary">
             ID:{' '}
             <Typography component="span" variant="body2">
-              {data.adress || data.block || '-'}
+              {data.address || data.block || '-'}
             </Typography>
           </Typography>
         </div>

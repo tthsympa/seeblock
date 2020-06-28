@@ -6,8 +6,8 @@ export type Input = {
   +type: number,
 };
 
-export type AdressDatas = {
-  adress: string,
+export type AddressDatas = {
+  address: string,
   block: number,
   count: number,
   from: List<*>,
@@ -33,7 +33,7 @@ export type InputFetch = {
 export type InputFetchSuccess = {
   +type: 'INPUT_FETCH_SUCCESS',
   +payload: {
-    +data: AdressDatas,
+    +data: AddressDatas,
   },
 };
 

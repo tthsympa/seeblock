@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-const AdressModel = function (status: string, step: string, source: string) {
+const AddressModel = function (status: string, step: string, source: string) {
   // Run the Group constructor with the given arguments
   THREE.Group.apply(this, arguments)
 
@@ -78,13 +78,13 @@ const AdressModel = function (status: string, step: string, source: string) {
     }
   }
 
-  const adress = new THREE.Mesh(geometry, material)
-  adress.rotateZ(Math.random() * Math.PI * 0.5)
-  adress.rotateY(Math.random() * Math.PI * 0.5)
-  this.add(adress)
+  const address = new THREE.Mesh(geometry, material)
+  address.rotateZ(Math.random() * Math.PI * 0.5)
+  address.rotateY(Math.random() * Math.PI * 0.5)
+  this.add(address)
 }
 
-AdressModel.prototype = Object.create(THREE.Group.prototype)
-AdressModel.prototype.constructor = AdressModel
+AddressModel.prototype = Object.create(THREE.Group.prototype)
+AddressModel.prototype.constructor = AddressModel
 
-export default AdressModel
+export default AddressModel

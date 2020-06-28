@@ -8,7 +8,7 @@ import Lottie from 'react-lottie'
 import type { InputState } from 'reduxTypes/input'
 import TrackballControls from 'helpers/TrackballControls'
 import GPUParticleSystem from 'helpers/GPUParticleSystem'
-import AdressModel from 'helpers/AdressModel'
+import AddressModel from 'helpers/AddressModel'
 import * as animationData from 'assets/eyeball.json'
 import Infos from './Infos'
 import styles from './Body.css'
@@ -58,7 +58,7 @@ const posBasedOnTimestamp = (bTimestamp: number, base: number) => {
     : posBasedOnTimestamp(bTimestamp, max)
 }
 
-const createAdressModel = (
+const createAddressModel = (
   id: string | Number = 'None',
   txInfos,
   from: boolean
@@ -79,21 +79,21 @@ const createAdressModel = (
       scale = SCALEMIN
     }
   }
-  const adress = new AdressModel(
+  const address = new AddressModel(
     status,
     step > 8 ? '8' : step.toString(),
     from ? 'from' : 'to'
   )
-  adress.name = id
-  adress.scale.multiplyScalar(scale)
+  address.name = id
+  address.scale.multiplyScalar(scale)
 
   const obj = posBasedOnTimestamp(bTimestamp, 0)
   const { vByTime, max } = obj
-  adress.position.x = vByTime.x * (100 + max) - max
-  adress.position.z = from ? -(vByTime.z * 100) : vByTime.z * 100
-  adress.position.y = vByTime.y * (100 + max) - max
+  address.position.x = vByTime.x * (100 + max) - max
+  address.position.z = from ? -(vByTime.z * 100) : vByTime.z * 100
+  address.position.y = vByTime.y * (100 + max) - max
 
-  return adress
+  return address
 }
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -140,12 +140,12 @@ class Body extends React.Component<Props, State> {
     scene.add(light2)
 
     //  Custom
-    const adressParticleSystem = new GPUParticleSystem({
+    const addressParticleSystem = new GPUParticleSystem({
       maxParticles: 2000,
     })
 
     // options passed during each particle spawn
-    const adressParticleOptions = {
+    const addressParticleOptions = {
       position: new THREE.Vector3(),
       positionRandomness: 0.1,
       velocity: new THREE.Vector3(),
@@ -157,7 +157,7 @@ class Body extends React.Component<Props, State> {
       size: 1,
       sizeRandomness: 0.5,
     }
-    const adressSpawnerParticleOptions = {
+    const addressSpawnerParticleOptions = {
       spawnRate: 2000,
       horizontalSpeed: 1.5,
       verticalSpeed: 1.33,
@@ -196,9 +196,9 @@ class Body extends React.Component<Props, State> {
     this.pivotFrom = pivotFrom
     this.pivotTo = pivotTo
     this.tick = tick
-    this.adressParticleSystem = adressParticleSystem
-    this.adressParticleOptions = adressParticleOptions
-    this.adressSpawnerParticleOptions = adressSpawnerParticleOptions
+    this.addressParticleSystem = addressParticleSystem
+    this.addressParticleOptions = addressParticleOptions
+    this.addressSpawnerParticleOptions = addressSpawnerParticleOptions
 
     //    Starting
     this.mount.appendChild(this.renderer.domElement)
@@ -222,11 +222,11 @@ class Body extends React.Component<Props, State> {
         if (Object.keys(data).length !== 0 && data.constructor === Object) {
           const { from, to } = data
           to.forEach((txInfos) => {
-            this.pivotTo.add(createAdressModel(txInfos.adress, txInfos, false))
+            this.pivotTo.add(createAddressModel(txInfos.address, txInfos, false))
           })
 
           from.forEach((txInfos) => {
-            this.pivotFrom.add(createAdressModel(txInfos.adress, txInfos, true))
+            this.pivotFrom.add(createAddressModel(txInfos.address, txInfos, true))
           })
         }
       }
@@ -288,7 +288,7 @@ class Body extends React.Component<Props, State> {
           actualPos.z
         )
         this.controls.enabled = false
-        this.scene.add(this.adressParticleSystem)
+        this.scene.add(this.addressParticleSystem)
         console.log(INTERSECTED)
         console.log(this.pivotFrom)
         console.log(this.pivotTo)
@@ -358,12 +358,12 @@ class Body extends React.Component<Props, State> {
       .start()
 
     // Remove Particle system if no focus
-    this.scene.remove(this.adressParticleSystem)
+    this.scene.remove(this.addressParticleSystem)
     // this.selectedAddress = ''
   }
 
   spawnParticle = (object, pivotName: string) => {
-    // Apply lerp to adress with Particle
+    // Apply lerp to address with Particle
     const objWorldPos = object.getWorldPosition()
     const a = {
       x: objWorldPos.x,
@@ -379,31 +379,31 @@ class Body extends React.Component<Props, State> {
     const newX = lerp(a.x, b.x, ease(t))
     const newY = lerp(a.y, b.y, ease(t))
     const newZ = lerp(a.z, b.z, ease(t))
-    this.adressParticleOptions.position.x = newX
-    this.adressParticleOptions.position.y = newY
-    this.adressParticleOptions.position.z = newZ
+    this.addressParticleOptions.position.x = newX
+    this.addressParticleOptions.position.y = newY
+    this.addressParticleOptions.position.z = newZ
     t += dt
     if (t <= 0 || t >= 1) dt = -dt
 
     // SpawnParticle
     const delta =
-      this.clock.getDelta() * this.adressSpawnerParticleOptions.timeScale
+      this.clock.getDelta() * this.addressSpawnerParticleOptions.timeScale
     this.tick += delta
     if (this.tick < 0) {
       this.tick = 0
     }
     if (delta > 0) {
-      this.adressParticleOptions.color =
+      this.addressParticleOptions.color =
         pivotName === 'to' ? 0xf6ebd7 : 0xdef4ee
       for (
         let x = 0;
-        x < this.adressSpawnerParticleOptions.spawnRate * delta;
+        x < this.addressSpawnerParticleOptions.spawnRate * delta;
         x += 1
       ) {
-        this.adressParticleSystem.spawnParticle(this.adressParticleOptions)
+        this.addressParticleSystem.spawnParticle(this.addressParticleOptions)
       }
     }
-    this.adressParticleSystem.update(this.tick)
+    this.addressParticleSystem.update(this.tick)
   }
 
   //    Declaring important variable
@@ -418,9 +418,9 @@ class Body extends React.Component<Props, State> {
   parent: THREE.Object3D
   pivotFrom: THREE.Object3D
   pivotTo: THREE.Object3D
-  adressParticleSystem: THREE.GPUParticleSystem
-  adressParticleOptions: Object
-  adressSpawnerParticleOptions: Object
+  addressParticleSystem: THREE.GPUParticleSystem
+  addressParticleOptions: Object
+  addressSpawnerParticleOptions: Object
   tick: number
   frameId: number
 

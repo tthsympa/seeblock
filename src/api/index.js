@@ -2,7 +2,7 @@
 
 import Web3 from 'web3'
 import { TYPE, STARTBLOCKOFFSET, WEI, LOCALHOST } from 'config/constants'
-import type { Input, AdressDatas } from 'reduxTypes/input'
+import type { Input, AddressDatas } from 'reduxTypes/input'
 import { List } from 'immutable'
 
 const getWeb3Object = () => new Web3(Web3.givenProvider || LOCALHOST)
@@ -25,8 +25,8 @@ const getTxData = (tx): Object => {
 }
 
 const getTxByBlock = async (blockNumber: number) => {
-  const txs: AdressDatas = {
-    adress: '',
+  const txs: AddressDatas = {
+    address: '',
     block: blockNumber,
     count: 0,
     from: List(),
@@ -40,13 +40,13 @@ const getTxByBlock = async (blockNumber: number) => {
     block.transactions.forEach((tx) => {
       txs.from = txs.from.push({
         ...getTxData(tx),
-        adress: tx.from,
+        address: tx.from,
         bTimestamp: block.timestamp,
         from: true,
       })
       txs.to = txs.to.push({
         ...getTxData(tx),
-        adress: tx.to,
+        address: tx.to,
         bTimestamp: block.timestamp,
         from: false,
       })
@@ -56,9 +56,9 @@ const getTxByBlock = async (blockNumber: number) => {
   return txs
 }
 
-const getTxByAdress = async (adress: string) => {
-  const txs: AdressDatas = {
-    adress,
+const getTxByAddress = async (address: string) => {
+  const txs: AddressDatas = {
+    address,
     block: -1,
     count: 0,
     from: List(),
@@ -74,17 +74,17 @@ const getTxByAdress = async (adress: string) => {
     const block = await getBlockDatas(i)
     if (block && block.transactions) {
       block.transactions.forEach((tx) => {
-        if (tx.to === adress) {
+        if (tx.to === address) {
           txs.from = txs.from.push({
             ...getTxData(tx),
-            adress: tx.from,
+            address: tx.from,
             bTimestamp: block.timestamp,
             from: true,
           })
-        } else if (tx.from === adress) {
+        } else if (tx.from === address) {
           txs.to = txs.to.push({
             ...getTxData(tx),
-            adress: tx.to,
+            address: tx.to,
             bTimestamp: block.timestamp,
             from: false,
           })
@@ -100,8 +100,8 @@ export const fetchElemFromBC = ({ elem, type }: Input) => {
   switch (type) {
     case TYPE.BLOCK:
       return getTxByBlock(parseInt(elem, 10))
-    case TYPE.ADRESS:
-      return getTxByAdress(elem)
+    case TYPE.ADDRESS:
+      return getTxByAddress(elem)
     default:
       return null
   }

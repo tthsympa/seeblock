@@ -15,7 +15,7 @@ const SearchBar = ({ inputError, verifyInput, go }: Props): Node => (
   <div className={styles.search}>
     <TextField
       id="search"
-      label="Adress / Block"
+      label="Address / Block"
       width="90%"
       error={inputError}
       onChange={changeEvent => (verifyInput(
