@@ -1,30 +1,17 @@
 # seeblock
 Visual interpretation of what happen in a blockchain
 
+You can input address or block number from the Ethereum blockchain and seeblock will display transactions in a graphic way.
+
 # Get started
 ### Basic
-Clone the project and 
-`npm install` or `yarn install`
+Clone the project and `yarn`
+
 ### Getting the Ethereum blockchain
-First we need Geth. If you don't have it installed globally, I suggest you to go the [installation instruction](https://github.com/ethereum/go-ethereum/wiki/Installation-Instructions-for-Mac).
-Then, start download the Ethereum blockchain. It's actually really big so we will stick with the light sync mode.
-```
-geth --syncmode "light" console
-```
-It will download a light version of the blockchain. The `console` command start a JavaScript interpreter. You can follow the download by typing `eth.syncing` : if it return `false`, the sync is completed !
+First, you need to have the Ethereum network injected in your browser. I suggest to use [Metamask](https://metamask.io/) web extansion (Chrome, Firefox). It will add blockchain context in the browser and seeblock will use it to perform it's requests.
+
 ### Starting the project
-Before seeblock can interact locally with the Ethereum blockchain, we must authorize communication protocol in Geth.
-Launch
-```
-geth --syncmode "light" --ws --wsorigins "http://localhost:8080"
-```
-In another terminal, go in seeblock cloned folder and launch `npm run dev`
+Fire `yarn dev`. It should open the app on `http://localhost:8080`. 
 
-Go to http://localhost:8080 
-
-Done !
-
-# Next ?
-seeblock is a work in progress. We will be happy to receive any advice on building this app.
 
 
