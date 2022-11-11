@@ -2,45 +2,38 @@ name: Node CI
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'v*'
 
 jobs:
   build:
-    name: Build Docker image
+    name: Build & Push Docker image
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Build & push Docker image
-        uses: docker/build-push-action@v1
+      - name: Login to Docker registry
+        uses: docker/login-action@v2
         with:
           username: nologin
-          password: ${{ secrets.SCW_SECRET_TOKEN }}
+          password: ${{ secrets.TTHSYMPA_SCW_SECRET_KEY }}
           registry: rg.fr-par.scw.cloud
-          repository: tthsympa/seeblock
-          tags: latest
+
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          load: true
+          tags: rg.fr-par.scw.cloud/tthsympa/home:latest
+      - run: docker push rg.fr-par.scw.cloud/tthsympa/seeblock:latest
 
   deploy:
-    name: Deploy Docker image
+    name: Deploy Container
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy & run throught SSH
-        uses: fifsky/ssh-action@v0.0.4
-        env:
-          REGISTRY: rg.fr-par.scw.cloud
-          TOKEN: ${{ secrets.SCW_SECRET_TOKEN }}
-          PORT: 8080
-        with:
-          command: |
-            docker login ${{ env.REGISTRY }}/tthsympa -u nologin -p ${{ env.TOKEN }}
-            docker pull ${{ env.REGISTRY }}/tthsympa/seeblock:latest
-            docker container stop tthsympa_seeblock
-            docker container rm tthsympa_seeblock
-            docker run -d --name tthsympa_seeblock -p ${{ env.PORT }}:${{ env.PORT }} ${{ env.REGISTRY }}/tthsympa/seeblock:latest
-          host: ${{ secrets.REMOTE_HOST }}
-          user: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY}}
+      - name: Trigger deploy
+        run: |
+          curl -X POST -H 'X-Auth-Token: ${{ secrets.TTHSYMPA_SCW_SECRET_KEY }}' 'https://api.scaleway.com/containers/v1beta1/regions/fr-par/containers/1428b186-89ac-4f26-a079-bd3de27f7848/deploy' -d '{}'
